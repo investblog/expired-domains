@@ -3,6 +3,8 @@ name: Submit to stores
 # This is a thin caller of the shared investblog WXT submission workflow.
 # v0.1.0 is deliberately excluded: its GitHub-built packages are submitted
 # manually to establish the store listings and obtain their extension IDs.
+# A manual dry run of v0.1.0 is still allowed — it publishes nothing and checks
+# the store credentials before the first release.
 on:
   push:
     tags:
@@ -38,7 +40,7 @@ concurrency:
 jobs:
   submit:
     if: >-
-      (github.event_name == 'workflow_dispatch' && inputs.tag != 'v0.1.0') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.tag != 'v0.1.0' || inputs.dry_run)) ||
       (github.event_name == 'push' && github.ref_name != 'v0.1.0')
     uses: investblog/geo-tier-builder/.github/workflows/store-submit.yml@main
     secrets: inherit
