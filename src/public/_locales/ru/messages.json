@@ -1,0 +1,591 @@
+{
+  "extName": {
+    "message": "Expired Domains"
+  },
+  "extDescription": {
+    "message": "Собирает списки expireddomains.net по мере просмотра; выгрузка в CSV/TXT. Неофициальное расширение, не связано с ExpiredDomains.net."
+  },
+  "panelOnPage": {
+    "message": "На странице: $count$",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "panelPage": {
+    "message": "стр. $page$ из $pages$",
+    "placeholders": {
+      "page": {
+        "content": "$1"
+      },
+      "pages": {
+        "content": "$2"
+      }
+    }
+  },
+  "panelSave": {
+    "message": "Сохранить страницу"
+  },
+  "panelAutoCapture": {
+    "message": "Автосбор при открытии"
+  },
+  "panelCollapse": {
+    "message": "Свернуть"
+  },
+  "panelExpand": {
+    "message": "Развернуть"
+  },
+  "panelSaving": {
+    "message": "Сохранение…"
+  },
+  "panelSaved": {
+    "message": "+$added$ новых, обновлено $updated$ · всего $total$",
+    "placeholders": {
+      "added": {
+        "content": "$1"
+      },
+      "updated": {
+        "content": "$2"
+      },
+      "total": {
+        "content": "$3"
+      }
+    }
+  },
+  "panelNotSaved": {
+    "message": "Не сохранено — повторите"
+  },
+  "panelReload": {
+    "message": "Расширение обновлено — обновите страницу"
+  },
+  "panelEmpty": {
+    "message": "Список пуст"
+  },
+  "panelLayoutUnknown": {
+    "message": "Вёрстка сайта не распознана — сохранение отключено"
+  },
+  "popupShown": {
+    "message": "$p1$ из $p2$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      },
+      "p2": {
+        "content": "$2"
+      }
+    }
+  },
+  "popupSelectAll": {
+    "message": "Выбрать все $p1$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "popupMoreRows": {
+    "message": "…и ещё $p1$: сузьте фильтр или выгрузите",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "popupExportCount": {
+    "message": "Выгрузка: $p1$ из $p2$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      },
+      "p2": {
+        "content": "$2"
+      }
+    }
+  },
+  "popupNotSaved": {
+    "message": "Не сохранено — повторите"
+  },
+  "popupTheme": {
+    "message": "Тема: системная / светлая / тёмная"
+  },
+  "filterTextPlaceholder": {
+    "message": "Текст или /regex/"
+  },
+  "filterPreset": {
+    "message": "Подборка"
+  },
+  "filterAny": {
+    "message": "любой"
+  },
+  "filterAvailable": {
+    "message": "свободен"
+  },
+  "filterRegistered": {
+    "message": "занят"
+  },
+  "filterAvailability": {
+    "message": "Свободен / занят"
+  },
+  "filterStatuses": {
+    "message": "Статус"
+  },
+  "filterLists": {
+    "message": "Списки"
+  },
+  "filterFreshHours": {
+    "message": "Данные не старше, часов"
+  },
+  "filterDroppedWithinDays": {
+    "message": "Освободился за последние, дней"
+  },
+  "filterDeletesWithinDays": {
+    "message": "Удаляется в ближайшие, дней"
+  },
+  "filterMinBl": {
+    "message": "BL не меньше"
+  },
+  "filterMinDp": {
+    "message": "DP не меньше"
+  },
+  "filterMinArchiveEntries": {
+    "message": "Записей в архиве не меньше"
+  },
+  "filterArchiveFirstYearMax": {
+    "message": "Первая запись в архиве не позже, год"
+  },
+  "filterMaxNameLength": {
+    "message": "Длина имени не больше"
+  },
+  "filterTagsAny": {
+    "message": "Есть любой из тегов"
+  },
+  "filterTagsNone": {
+    "message": "Нет ни одного из тегов"
+  },
+  "filterTagsPlaceholder": {
+    "message": "тег 1, тег 2"
+  },
+  "filterZones": {
+    "message": "Зоны"
+  },
+  "filterAuctionActive": {
+    "message": "Аукцион ещё идёт"
+  },
+  "filterNoDigits": {
+    "message": "Без цифр"
+  },
+  "filterNoHyphens": {
+    "message": "Без дефисов"
+  },
+  "filterRegexInvalid": {
+    "message": "Regex неверный или слишком сложный — не применяется"
+  },
+  "filterExcludedNoData": {
+    "message": "Исключено из-за отсутствия данных: $p1$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "presetAll": {
+    "message": "Без отклонённых"
+  },
+  "presetWorkingDrops": {
+    "message": "Рабочие — дропы"
+  },
+  "presetWorkingAuctions": {
+    "message": "Рабочие — аукционы"
+  },
+  "presetNamePlaceholder": {
+    "message": "Имя подборки"
+  },
+  "presetSaveAs": {
+    "message": "Сохранить как подборку"
+  },
+  "presetRename": {
+    "message": "Переименовать"
+  },
+  "presetDelete": {
+    "message": "Удалить подборку"
+  },
+  "presetSaved": {
+    "message": "Подборка сохранена"
+  },
+  "presetError_name": {
+    "message": "Имя: от 1 до 40 символов"
+  },
+  "presetError_name_taken": {
+    "message": "Подборка с таким именем уже есть"
+  },
+  "presetError_limit": {
+    "message": "Не больше 20 подборок"
+  },
+  "presetError_not_found": {
+    "message": "Подборка не найдена"
+  },
+  "presetError_builtin": {
+    "message": "Встроенные подборки менять нельзя"
+  },
+  "presetError_filter": {
+    "message": "Часть условий заполнена неверно"
+  },
+  "statusNew": {
+    "message": "новый"
+  },
+  "statusShortlist": {
+    "message": "отобран"
+  },
+  "statusRejected": {
+    "message": "отклонён"
+  },
+  "statusBought": {
+    "message": "куплен"
+  },
+  "tagDelete": {
+    "message": "Снять тег «$p1$» со всех доменов",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "tagDeleteConfirm": {
+    "message": "Снять?"
+  },
+  "tagDeleted": {
+    "message": "Тег «$p1$» снят",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "tagInvalid": {
+    "message": "Неверный тег «$p1$»: от 1 до 40 символов, без «,» и «;»",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "tagsOverflow": {
+    "message": "Теги не поместились (не больше 20) у доменов: $p1$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "bulkSelected": {
+    "message": "Выбрано: $p1$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "bulkSetStatus": {
+    "message": "Поставить статус"
+  },
+  "bulkTagPlaceholder": {
+    "message": "тег"
+  },
+  "bulkAddTag": {
+    "message": "Добавить тег"
+  },
+  "bulkRemoveTag": {
+    "message": "Снять тег"
+  },
+  "bulkClear": {
+    "message": "Снять выбор"
+  },
+  "bulkDone": {
+    "message": "Изменено: $p1$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "editorStatus": {
+    "message": "Статус"
+  },
+  "editorTags": {
+    "message": "Теги через запятую"
+  },
+  "editorNote": {
+    "message": "Заметка"
+  },
+  "editorSave": {
+    "message": "Сохранить"
+  },
+  "editorCancel": {
+    "message": "Отмена"
+  },
+  "exportCopy": {
+    "message": "Копировать"
+  },
+  "exportCopied": {
+    "message": "Скопировано: $p1$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "exportCopyFailed": {
+    "message": "Не удалось скопировать"
+  },
+  "backupDownload": {
+    "message": "Резервная копия"
+  },
+  "clearAll": {
+    "message": "Очистить"
+  },
+  "clearQuestion": {
+    "message": "Удалить все домены ($p1$)?",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "clearWarning": {
+    "message": "Статусы, теги и заметки тоже удалятся. Настройки и подборки останутся."
+  },
+  "clearConfirm": {
+    "message": "Да, удалить $p1$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "clearBackupFirst": {
+    "message": "Сначала сохранить резервную копию"
+  },
+  "clearDone": {
+    "message": "Список очищен"
+  },
+  "restoreChoose": {
+    "message": "Восстановить из копии…"
+  },
+  "restoreFileInfo": {
+    "message": "$p1$: доменов $p2$, сохранена $p3$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      },
+      "p2": {
+        "content": "$2"
+      },
+      "p3": {
+        "content": "$3"
+      }
+    }
+  },
+  "restoreMerge": {
+    "message": "Объединить"
+  },
+  "restoreReplace": {
+    "message": "Заменить всё"
+  },
+  "restoreReplaceConfirm": {
+    "message": "Да, заменить всё (сейчас $p1$)",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "restoreDone": {
+    "message": "Восстановлено. Доменов: $p1$; теги не поместились: $p2$; подборок пропущено: $p3$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      },
+      "p2": {
+        "content": "$2"
+      },
+      "p3": {
+        "content": "$3"
+      }
+    }
+  },
+  "restoreInvalid": {
+    "message": "Файл отклонён, ничего не изменено: $p1$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "footerRate": {
+    "message": "Оценить"
+  },
+  "footerIssues": {
+    "message": "Сообщить о проблеме"
+  },
+  "noteTooLong": {
+    "message": "Заметка длиннее 1000 символов"
+  },
+  "popupNotReady": {
+    "message": "Не удалось подготовить сохранённый список. Закройте и откройте панель снова."
+  },
+  "drawerClose": {
+    "message": "Закрыть"
+  },
+  "filterTitle": {
+    "message": "Фильтры"
+  },
+  "filterTitleActive": {
+    "message": "Фильтры: активно $p1$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "filterGroupTime": {
+    "message": "Доступность и сроки"
+  },
+  "filterGroupMetrics": {
+    "message": "Метрики"
+  },
+  "filterGroupName": {
+    "message": "Имя домена"
+  },
+  "filterGroupTags": {
+    "message": "Теги"
+  },
+  "filterReset": {
+    "message": "Сбросить"
+  },
+  "filterShow": {
+    "message": "Показать: $p1$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "searchClear": {
+    "message": "Очистить поиск"
+  },
+  "dataTitle": {
+    "message": "Данные и резервная копия"
+  },
+  "dataBackupLegend": {
+    "message": "Резервная копия"
+  },
+  "dataClearLegend": {
+    "message": "Очистка списка"
+  },
+  "bulkEdit": {
+    "message": "Изменить…"
+  },
+  "emptyRestore": {
+    "message": "Восстановить из резервной копии…"
+  },
+  "welTagline": {
+    "message": "Собирайте списки expireddomains.net, которые листаете, в одну коллекцию: фильтры, пометки, выгрузка."
+  },
+  "welWhatTitle": {
+    "message": "Что это и зачем"
+  },
+  "welWhatSite": {
+    "message": "ExpiredDomains.net — бесплатный сервис со списками освобождающихся доменов: удалённых и истекающих, ожидающих удаления, выставленных на аукционы GoDaddy, Sedo и других. Каждый список — постраничная таблица с метриками: обратные ссылки, возраст в веб-архиве, заняты ли другие зоны и т. п."
+  },
+  "welWhatExt": {
+    "message": "Отбор там — это листание множества страниц. Расширение сохраняет таблицы открытых вами страниц в один список у вас в браузере — без дублей, с фильтрами, статусами, тегами и заметками, с выгрузкой в CSV, TXT или буфер обмена. Само оно страниц не открывает и запросов не отправляет."
+  },
+  "welStepAccountTitle": {
+    "message": "Войдите на ExpiredDomains.net"
+  },
+  "welStepAccountText": {
+    "message": "Большинство списков доменов видно только после входа — хватит бесплатного аккаунта. Аккаунт уже есть — откройте сайт и войдите."
+  },
+  "linkRegister": {
+    "message": "Зарегистрироваться бесплатно"
+  },
+  "linkSiteOpen": {
+    "message": "Открыть ExpiredDomains.net"
+  },
+  "welStepListTitle": {
+    "message": "Откройте список доменов"
+  },
+  "welStepListText": {
+    "message": "Например, удалённые домены .com или список аукциона. Справа вверху страницы появится маленькая панель Expired Domains с числом доменов на странице."
+  },
+  "welStepSaveTitle": {
+    "message": "Сохраните страницу"
+  },
+  "welStepSaveText": {
+    "message": "Нажмите «Сохранить страницу» в этой панели. Или включите «Автосбор при открытии» — тогда каждая открытая вами страница списка сохранится сама. Переходить к следующей странице — вам."
+  },
+  "welStepPanelTitle": {
+    "message": "Разберите список в боковой панели"
+  },
+  "welStepPanelText": {
+    "message": "Нажмите значок расширения на панели браузера. Боковая панель остаётся открытой рядом с сайтом и обновляется, пока вы сохраняете страницы."
+  },
+  "welPanelTitle": {
+    "message": "Что в боковой панели"
+  },
+  "welPanelText": {
+    "message": "Всё сохранённое — в одном списке:"
+  },
+  "welFeatureFilters": {
+    "message": "Фильтры: текст или /regex/, список, свободен или занят, свежесть данных, даты освобождения и удаления, идущие аукционы, BL/DP, возраст в архиве, зоны, длина имени."
+  },
+  "welFeaturePresets": {
+    "message": "Подборки: «Рабочие — дропы», «Рабочие — аукционы» и до 20 своих."
+  },
+  "welFeatureMarks": {
+    "message": "Статусы, теги и заметки — для одного домена или сразу для всех выбранных."
+  },
+  "welFeatureExport": {
+    "message": "Выгрузка отфильтрованного: CSV для Excel, TXT или копирование в буфер обмена."
+  },
+  "welFeatureBackup": {
+    "message": "Резервная копия всего в JSON-файл и восстановление из неё."
+  },
+  "welOpenPanel": {
+    "message": "Открыть боковую панель"
+  },
+  "welPinHint": {
+    "message": "Совет: закрепите значок Expired Domains на панели браузера (значок пазла → булавка), чтобы панель была в один клик."
+  },
+  "welOpenPanelManual": {
+    "message": "Нажмите значок Expired Domains на панели браузера, чтобы открыть панель."
+  },
+  "welPrivacyTitle": {
+    "message": "Всё остаётся у вас"
+  },
+  "welPrivacyText": {
+    "message": "Расширение читает только таблицу доменов и адрес списка на открытых вами страницах ExpiredDomains.net — не имя аккаунта, почту или баланс. Данные хранятся только в этом браузере. Сетевых запросов и аналитики нет."
+  },
+  "welUnofficial": {
+    "message": "Неофициальное расширение, не связано с ExpiredDomains.net."
+  },
+  "emptyTitle": {
+    "message": "Список пока пуст"
+  },
+  "emptyText": {
+    "message": "Expired Domains собирает списки доменов с ExpiredDomains.net — бесплатного сервиса с удалёнными, истекающими и аукционными доменами. Сохраняются только страницы, которые вы открываете сами."
+  },
+  "emptyStepAccount": {
+    "message": "Войдите на ExpiredDomains.net — большинство списков видно только после входа, хватит бесплатного аккаунта."
+  },
+  "emptyStepList": {
+    "message": "Откройте там любой список доменов."
+  },
+  "emptyStepSave": {
+    "message": "Нажмите «Сохранить страницу» в маленькой панели справа вверху или включите автосбор."
+  },
+  "welcomeLink": {
+    "message": "Как это работает"
+  }
+}

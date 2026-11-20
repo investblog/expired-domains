@@ -1,0 +1,39 @@
+{
+  "name": "expired-domains",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Save domain lists from expireddomains.net pages you open and export them to CSV, TXT or clipboard.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wxt",
+    "dev:firefox": "wxt -b firefox",
+    "build": "wxt build",
+    "build:firefox": "wxt build -b firefox",
+    "build:edge": "wxt build -b edge",
+    "build:all": "wxt build && wxt build -b edge && wxt build -b firefox",
+    "zip": "wxt zip",
+    "zip:firefox": "wxt zip -b firefox",
+    "zip:edge": "wxt zip -b edge",
+    "zip:all": "wxt zip && wxt zip -b firefox && wxt zip -b edge",
+    "postinstall": "wxt prepare",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check src/ tests/ wxt.config.ts vitest.config.ts",
+    "lint:fix": "biome check --write src/ tests/ wxt.config.ts vitest.config.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check": "tsc --noEmit && biome check src/ tests/ wxt.config.ts vitest.config.ts && vitest run && npm run check:invariants",
+    "check:invariants": "npm run build:all && node scripts/check-invariants.mjs",
+    "icons": "node scripts/make-icons.mjs",
+    "store:harness": "wxt build && node scripts/store-harness.mjs",
+    "promo": "node scripts/make-promo.mjs"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.14",
+    "@resvg/resvg-js": "^2.6.2",
+    "jsdom": "^31.0.1",
+    "typescript": "^5.7.0",
+    "vitest": "^4.0.18",
+    "wxt": "^0.19.0"
+  }
+}

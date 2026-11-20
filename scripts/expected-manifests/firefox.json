@@ -1,0 +1,39 @@
+{
+  "manifest_version": 2,
+  "name": "__MSG_extName__",
+  "description": "__MSG_extDescription__",
+  "default_locale": "en",
+  "homepage_url": "https://301.st",
+  "author": "301.st — Smart Traffic <support@301.st>",
+  "minimum_chrome_version": null,
+  "permissions": ["storage", "unlimitedStorage"],
+  "content_script_matches": ["*://*.expireddomains.net/*", "*://expireddomains.net/*"],
+  "background": { "kind": "scripts", "persistent": null },
+  "action_key": "browser_action",
+  "action_default_popup": null,
+  "action_default_title": "__MSG_extName__",
+  "commands": { "_execute_sidebar_action": { "description": "Toggle the Expired Domains sidebar" } },
+  "side_panel": null,
+  "sidebar_action": {
+    "default_panel": "sidepanel.html",
+    "default_title": "Expired Domains",
+    "default_icon": { "16": "icons/16.png", "48": "icons/48.png" },
+    "open_at_install": false
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "expired-domains@301.st",
+      "strict_min_version": "140.0",
+      "data_collection_permissions": { "required": ["none"] }
+    }
+  },
+  "absent": {
+    "host_permissions": true,
+    "optional_permissions": true,
+    "optional_host_permissions": true,
+    "web_accessible_resources": true,
+    "content_security_policy": true,
+    "externally_connectable": true
+  },
+  "has_tabs_permission": false
+}

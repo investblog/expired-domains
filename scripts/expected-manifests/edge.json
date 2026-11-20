@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "__MSG_extName__",
+  "description": "__MSG_extDescription__",
+  "default_locale": "en",
+  "homepage_url": "https://301.st",
+  "author": "301.st — Smart Traffic <support@301.st>",
+  "minimum_chrome_version": null,
+  "permissions": ["sidePanel", "storage", "unlimitedStorage"],
+  "content_script_matches": ["*://*.expireddomains.net/*", "*://expireddomains.net/*"],
+  "background": { "kind": "service_worker", "type": null },
+  "action_key": "action",
+  "action_default_popup": null,
+  "action_default_title": "__MSG_extName__",
+  "commands": null,
+  "side_panel": { "default_path": "sidepanel.html" },
+  "sidebar_action": null,
+  "browser_specific_settings": null,
+  "absent": {
+    "host_permissions": true,
+    "optional_permissions": true,
+    "optional_host_permissions": true,
+    "web_accessible_resources": true,
+    "content_security_policy": true,
+    "externally_connectable": true
+  },
+  "has_tabs_permission": false
+}

@@ -1,0 +1,591 @@
+{
+  "extName": {
+    "message": "Expired Domains"
+  },
+  "extDescription": {
+    "message": "Save expireddomains.net lists as you browse, filter and export to CSV/TXT. Unofficial. Not affiliated with ExpiredDomains.net."
+  },
+  "panelOnPage": {
+    "message": "On page: $count$",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "panelPage": {
+    "message": "page $page$ of $pages$",
+    "placeholders": {
+      "page": {
+        "content": "$1"
+      },
+      "pages": {
+        "content": "$2"
+      }
+    }
+  },
+  "panelSave": {
+    "message": "Save page"
+  },
+  "panelAutoCapture": {
+    "message": "Auto-capture on page load"
+  },
+  "panelCollapse": {
+    "message": "Collapse"
+  },
+  "panelExpand": {
+    "message": "Expand"
+  },
+  "panelSaving": {
+    "message": "Saving…"
+  },
+  "panelSaved": {
+    "message": "+$added$ new, $updated$ updated · total $total$",
+    "placeholders": {
+      "added": {
+        "content": "$1"
+      },
+      "updated": {
+        "content": "$2"
+      },
+      "total": {
+        "content": "$3"
+      }
+    }
+  },
+  "panelNotSaved": {
+    "message": "Not saved — try again"
+  },
+  "panelReload": {
+    "message": "Extension was updated — reload the page"
+  },
+  "panelEmpty": {
+    "message": "The list is empty"
+  },
+  "panelLayoutUnknown": {
+    "message": "Site layout not recognized — saving is disabled"
+  },
+  "popupShown": {
+    "message": "$p1$ of $p2$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      },
+      "p2": {
+        "content": "$2"
+      }
+    }
+  },
+  "popupSelectAll": {
+    "message": "Select all $p1$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "popupMoreRows": {
+    "message": "…and $p1$ more: narrow the filter or export",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "popupExportCount": {
+    "message": "Export: $p1$ of $p2$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      },
+      "p2": {
+        "content": "$2"
+      }
+    }
+  },
+  "popupNotSaved": {
+    "message": "Not saved — try again"
+  },
+  "popupTheme": {
+    "message": "Theme: system / light / dark"
+  },
+  "filterTextPlaceholder": {
+    "message": "Text or /regex/"
+  },
+  "filterPreset": {
+    "message": "Preset"
+  },
+  "filterAny": {
+    "message": "any"
+  },
+  "filterAvailable": {
+    "message": "available"
+  },
+  "filterRegistered": {
+    "message": "registered"
+  },
+  "filterAvailability": {
+    "message": "Available / registered"
+  },
+  "filterStatuses": {
+    "message": "Status"
+  },
+  "filterLists": {
+    "message": "Lists"
+  },
+  "filterFreshHours": {
+    "message": "Data not older than, hours"
+  },
+  "filterDroppedWithinDays": {
+    "message": "Dropped within, days"
+  },
+  "filterDeletesWithinDays": {
+    "message": "Deleted within, days"
+  },
+  "filterMinBl": {
+    "message": "BL at least"
+  },
+  "filterMinDp": {
+    "message": "DP at least"
+  },
+  "filterMinArchiveEntries": {
+    "message": "Archive entries at least"
+  },
+  "filterArchiveFirstYearMax": {
+    "message": "First archived no later than, year"
+  },
+  "filterMaxNameLength": {
+    "message": "Name length at most"
+  },
+  "filterTagsAny": {
+    "message": "Has any of tags"
+  },
+  "filterTagsNone": {
+    "message": "Has none of tags"
+  },
+  "filterTagsPlaceholder": {
+    "message": "tag 1, tag 2"
+  },
+  "filterZones": {
+    "message": "Zones"
+  },
+  "filterAuctionActive": {
+    "message": "Auction still running"
+  },
+  "filterNoDigits": {
+    "message": "No digits"
+  },
+  "filterNoHyphens": {
+    "message": "No hyphens"
+  },
+  "filterRegexInvalid": {
+    "message": "Regex is invalid or too complex — not applied"
+  },
+  "filterExcludedNoData": {
+    "message": "Excluded for missing data: $p1$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "presetAll": {
+    "message": "All except rejected"
+  },
+  "presetWorkingDrops": {
+    "message": "Working — drops"
+  },
+  "presetWorkingAuctions": {
+    "message": "Working — auctions"
+  },
+  "presetNamePlaceholder": {
+    "message": "Preset name"
+  },
+  "presetSaveAs": {
+    "message": "Save as preset"
+  },
+  "presetRename": {
+    "message": "Rename"
+  },
+  "presetDelete": {
+    "message": "Delete preset"
+  },
+  "presetSaved": {
+    "message": "Preset saved"
+  },
+  "presetError_name": {
+    "message": "Name: 1 to 40 characters"
+  },
+  "presetError_name_taken": {
+    "message": "A preset with this name already exists"
+  },
+  "presetError_limit": {
+    "message": "No more than 20 presets"
+  },
+  "presetError_not_found": {
+    "message": "Preset not found"
+  },
+  "presetError_builtin": {
+    "message": "Built-in presets cannot be changed"
+  },
+  "presetError_filter": {
+    "message": "Some conditions are filled in incorrectly"
+  },
+  "statusNew": {
+    "message": "new"
+  },
+  "statusShortlist": {
+    "message": "shortlisted"
+  },
+  "statusRejected": {
+    "message": "rejected"
+  },
+  "statusBought": {
+    "message": "bought"
+  },
+  "tagDelete": {
+    "message": "Remove tag “$p1$” from all domains",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "tagDeleteConfirm": {
+    "message": "Remove?"
+  },
+  "tagDeleted": {
+    "message": "Tag “$p1$” removed",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "tagInvalid": {
+    "message": "Invalid tag “$p1$”: 1 to 40 characters, no “,” or “;”",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "tagsOverflow": {
+    "message": "Tags did not fit (20 at most) on domains: $p1$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "bulkSelected": {
+    "message": "Selected: $p1$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "bulkSetStatus": {
+    "message": "Set status"
+  },
+  "bulkTagPlaceholder": {
+    "message": "tag"
+  },
+  "bulkAddTag": {
+    "message": "Add tag"
+  },
+  "bulkRemoveTag": {
+    "message": "Remove tag"
+  },
+  "bulkClear": {
+    "message": "Clear selection"
+  },
+  "bulkDone": {
+    "message": "Changed: $p1$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "editorStatus": {
+    "message": "Status"
+  },
+  "editorTags": {
+    "message": "Tags, comma-separated"
+  },
+  "editorNote": {
+    "message": "Note"
+  },
+  "editorSave": {
+    "message": "Save"
+  },
+  "editorCancel": {
+    "message": "Cancel"
+  },
+  "exportCopy": {
+    "message": "Copy"
+  },
+  "exportCopied": {
+    "message": "Copied: $p1$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "exportCopyFailed": {
+    "message": "Could not copy"
+  },
+  "backupDownload": {
+    "message": "Backup"
+  },
+  "clearAll": {
+    "message": "Clear"
+  },
+  "clearQuestion": {
+    "message": "Delete all domains ($p1$)?",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "clearWarning": {
+    "message": "Statuses, tags and notes are deleted too. Settings and presets stay."
+  },
+  "clearConfirm": {
+    "message": "Yes, delete $p1$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "clearBackupFirst": {
+    "message": "Save a backup first"
+  },
+  "clearDone": {
+    "message": "List cleared"
+  },
+  "restoreChoose": {
+    "message": "Restore from backup…"
+  },
+  "restoreFileInfo": {
+    "message": "$p1$: $p2$ domains, saved $p3$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      },
+      "p2": {
+        "content": "$2"
+      },
+      "p3": {
+        "content": "$3"
+      }
+    }
+  },
+  "restoreMerge": {
+    "message": "Merge"
+  },
+  "restoreReplace": {
+    "message": "Replace all"
+  },
+  "restoreReplaceConfirm": {
+    "message": "Yes, replace all (now $p1$)",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "restoreDone": {
+    "message": "Restored. Domains: $p1$; tags did not fit: $p2$; presets skipped: $p3$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      },
+      "p2": {
+        "content": "$2"
+      },
+      "p3": {
+        "content": "$3"
+      }
+    }
+  },
+  "restoreInvalid": {
+    "message": "File rejected, nothing changed: $p1$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "footerRate": {
+    "message": "Rate"
+  },
+  "footerIssues": {
+    "message": "Report a problem"
+  },
+  "noteTooLong": {
+    "message": "The note is longer than 1000 characters"
+  },
+  "popupNotReady": {
+    "message": "Could not prepare the saved list. Close and open the panel again."
+  },
+  "drawerClose": {
+    "message": "Close"
+  },
+  "filterTitle": {
+    "message": "Filters"
+  },
+  "filterTitleActive": {
+    "message": "Filters: $p1$ active",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "filterGroupTime": {
+    "message": "Availability and timing"
+  },
+  "filterGroupMetrics": {
+    "message": "Metrics"
+  },
+  "filterGroupName": {
+    "message": "Domain name"
+  },
+  "filterGroupTags": {
+    "message": "Tags"
+  },
+  "filterReset": {
+    "message": "Reset"
+  },
+  "filterShow": {
+    "message": "Show $p1$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "searchClear": {
+    "message": "Clear search"
+  },
+  "dataTitle": {
+    "message": "Data and backup"
+  },
+  "dataBackupLegend": {
+    "message": "Backup"
+  },
+  "dataClearLegend": {
+    "message": "Clear the list"
+  },
+  "bulkEdit": {
+    "message": "Edit…"
+  },
+  "emptyRestore": {
+    "message": "Restore from a backup…"
+  },
+  "welTagline": {
+    "message": "Turn the expireddomains.net lists you browse into one collection you can filter, mark and export."
+  },
+  "welWhatTitle": {
+    "message": "What is this for"
+  },
+  "welWhatSite": {
+    "message": "ExpiredDomains.net is a free service that lists domains being released: deleted and expiring domains, domains pending deletion, and domains on auctions such as GoDaddy or Sedo. Every list is a paged table with metrics: backlinks, Web Archive age, which other zones are taken, and more."
+  },
+  "welWhatExt": {
+    "message": "Picking domains there means paging through many pages. This extension saves the tables of the pages you open into one list in your browser — no duplicates, with filters, statuses, tags and notes, and export to CSV, TXT or the clipboard. It never opens pages or sends requests by itself."
+  },
+  "welStepAccountTitle": {
+    "message": "Sign in to ExpiredDomains.net"
+  },
+  "welStepAccountText": {
+    "message": "Most domain lists are shown only after you sign in — a free account is enough. Already registered? Open the site and sign in."
+  },
+  "linkRegister": {
+    "message": "Sign up free"
+  },
+  "linkSiteOpen": {
+    "message": "Open ExpiredDomains.net"
+  },
+  "welStepListTitle": {
+    "message": "Open a domain list"
+  },
+  "welStepListText": {
+    "message": "For example, Deleted .com Domains or an auction list. A small Expired Domains panel appears at the top right of the page with the number of domains on it."
+  },
+  "welStepSaveTitle": {
+    "message": "Save the page"
+  },
+  "welStepSaveText": {
+    "message": "Press “Save page” in that panel. Or turn on “Auto-capture on page load”: then every list page you open is saved by itself. Moving to the next page is up to you."
+  },
+  "welStepPanelTitle": {
+    "message": "Review the list in the side panel"
+  },
+  "welStepPanelText": {
+    "message": "Click the extension icon in the browser toolbar. The side panel stays open beside the site and updates as you save pages."
+  },
+  "welPanelTitle": {
+    "message": "In the side panel"
+  },
+  "welPanelText": {
+    "message": "Everything you saved, in one list:"
+  },
+  "welFeatureFilters": {
+    "message": "Filters: text or /regex/, list, available or registered, data age, drop and deletion dates, running auctions, BL/DP, archive age, zones, name length."
+  },
+  "welFeaturePresets": {
+    "message": "Presets: “Working — drops”, “Working — auctions” and up to 20 of your own."
+  },
+  "welFeatureMarks": {
+    "message": "Statuses, tags and notes — for one domain or for all selected at once."
+  },
+  "welFeatureExport": {
+    "message": "Export of the filtered list: CSV for Excel, TXT, or copy to the clipboard."
+  },
+  "welFeatureBackup": {
+    "message": "Backup and restore of everything as a JSON file."
+  },
+  "welOpenPanel": {
+    "message": "Open the side panel"
+  },
+  "welPinHint": {
+    "message": "Tip: pin the Expired Domains icon to the toolbar (puzzle icon → pin) so the panel is one click away."
+  },
+  "welOpenPanelManual": {
+    "message": "Click the Expired Domains icon in the browser toolbar to open the panel."
+  },
+  "welPrivacyTitle": {
+    "message": "Everything stays with you"
+  },
+  "welPrivacyText": {
+    "message": "The extension reads only the domain table and the list address of ExpiredDomains.net pages you open — not your account name, e-mail or balance. Data is kept only in this browser. No network requests, no analytics."
+  },
+  "welUnofficial": {
+    "message": "Unofficial. Not affiliated with ExpiredDomains.net."
+  },
+  "emptyTitle": {
+    "message": "Your list is empty"
+  },
+  "emptyText": {
+    "message": "Expired Domains collects domain lists from ExpiredDomains.net — a free service with deleted, expiring and auction domains. Only pages you open yourself are saved."
+  },
+  "emptyStepAccount": {
+    "message": "Sign in to ExpiredDomains.net — most lists are shown only after sign-in; a free account is enough."
+  },
+  "emptyStepList": {
+    "message": "Open any domain list there."
+  },
+  "emptyStepSave": {
+    "message": "Press “Save page” in the small panel at the top right, or turn on auto-capture."
+  },
+  "welcomeLink": {
+    "message": "How it works"
+  }
+}

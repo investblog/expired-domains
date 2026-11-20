@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Expired Domains: camera eye over a wireframe globe. Redrawn from the author's sketch as plain geometry.
+       Colors: 301.st tokens (301-ui StyleGuide) — rim = brand blue, lens = dark page bg, eye = blue-900/700/neon. -->
+  <defs>
+    <clipPath id="lens"><circle cx="64" cy="64" r="57"/></clipPath>
+  </defs>
+  <circle cx="64" cy="64" r="61" fill="#4DA3FF"/>
+  <circle cx="64" cy="64" r="57" fill="#111111"/>
+  <g clip-path="url(#lens)">
+    <g fill="none" stroke="#A0A4AF" stroke-width="0.8">
+      <circle cx="64" cy="190" r="88"/>
+      <circle cx="64" cy="190" r="82"/>
+      <circle cx="64" cy="190" r="76"/>
+      <circle cx="64" cy="190" r="70"/>
+      <path d="M64 102V128M76 102.8L80.2 128M52 102.8L47.8 128M88 105.3L95.2 128M40 105.3L32.8 128M100 109.7L108.3 128M28 109.7L19.7 128M112 116.2L118.6 128M16 116.2L9.4 128"/>
+    </g>
+    <path d="M8 47A66 66 0 0 1 120 47A74 74 0 0 0 8 47Z" fill="#E7E9EE"/>
+  </g>
+  <circle cx="64" cy="63" r="28" fill="#003682"/>
+  <circle cx="64" cy="63" r="17" fill="#0055DC"/>
+  <circle cx="64" cy="63" r="4.5" fill="#4DA3FF"/>
+  <circle cx="64" cy="63" r="3.2" fill="#FFFFFF"/>
+</svg>

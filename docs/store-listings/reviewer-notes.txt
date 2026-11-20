@@ -1,0 +1,47 @@
+SINGLE PURPOSE
+
+Expired Domains saves domain lists from expireddomains.net pages the user opens, so they can be collected across pages, reviewed, filtered and exported. It only reads pages that are already open; it sends no requests and never navigates.
+
+ACCOUNT ON EXPIREDDOMAINS.NET
+
+expireddomains.net shows its domain lists only to signed-in users, and it e-mails a login code whenever an account signs in from a new device. A shared test account would therefore stop you at that code. Please register your own free account instead — it takes a minute: https://www.expireddomains.net/register/
+
+Any e-mail address you can read works. If you prefer a disposable one, MailBot (free, by the same developer) gives a temporary address and shows the incoming code on top:
+- Chrome: https://chromewebstore.google.com/detail/mmjdbaijmhogoepflomfceeppgdbeelb
+- Edge: https://microsoftedge.microsoft.com/addons/detail/ofaahjfcjogpimmiocambhenlmagdhgj
+- Firefox: https://addons.mozilla.org/firefox/addon/mailbot-disposable-email/
+- Telegram, no install: https://t.me/gotemailbot
+An address lives 24 hours, enough for one review session.
+
+TEST STEPS
+
+1. Install the extension. A welcome tab opens once: it explains the site, the free account and the steps below.
+2. Register a free account at https://www.expireddomains.net/register/ (see above), confirm the e-mail and sign in.
+3. Open "Deleted Domains" → ".com" (or any domain list). A small "Expired Domains" panel appears at the top right of the page: "On page: 25 · page 1 of N".
+4. Press "Save page". The panel reports "+25 new, 0 updated · total 25" and the toolbar badge shows 25.
+5. Open the next page of the list yourself and press "Save page" again; the total grows. Turn on "Auto-capture on page load" and open one more page: it is saved without pressing the button.
+6. Click the toolbar icon. The side panel opens (Chrome and Edge: side panel; Firefox: sidebar — there is no popup). The list shows the collected domains and updates while you keep browsing.
+7. Type in the search field (for example "/^[a-z]{3,8}\.com$/"), pick a preset, or press the "Filters" button: the conditions open in a slide-out panel, and the button shows how many are active. Click a row: a panel opens to set a status, tags and a note. Tick rows or "Select all", then "Edit…" for bulk status and tags.
+8. Export with "Copy", "CSV" or "TXT" at the bottom of the side panel. The database icon in the header ("Data and backup") holds "Backup" (downloads a JSON file), "Restore from backup…" ("Merge" or "Replace all"), tag removal, and "Clear" with a confirmation.
+
+PERMISSIONS
+
+Content script on *://expireddomains.net/* and *://*.expireddomains.net/*: reads the domain table (#listing) of the page the user opened, its address and title, and shows the save panel. Nothing outside the listing is read.
+
+storage: keeps the collected domains, their columns, statuses, tags, notes and settings locally.
+
+unlimitedStorage: the collection is designed for up to 10,000 domains with about 30 columns each (about 7 MB), close to the default 10 MB quota of storage.local.
+
+sidePanel (Chrome and Edge): the list stays open beside the site while the user browses its pages.
+
+NETWORK REQUESTS
+
+None. The extension makes no network requests from any context (background, content script, side panel, welcome page). Links in the side panel and on the welcome page (301.st, the store page, GitHub, the expireddomains.net home and sign-up pages) are ordinary links opened by the user. The welcome tab is the extension's own page, opened once on install with tabs.create (no "tabs" permission).
+
+DATA AND REMOTE CODE
+
+All data stays in the browser's local storage. The developer receives nothing. No analytics, telemetry or advertising. No remotely hosted code; nothing is executed from the network. Firefox: data_collection_permissions is "none".
+
+AFFILIATION
+
+Unofficial. Not affiliated with ExpiredDomains.net. "Expired domains" is the generic name of the domain category.
