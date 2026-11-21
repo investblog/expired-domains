@@ -97,7 +97,11 @@ const PAGE_LINKS = [
 ];
 const URL_ALLOW = {
   any: [/^http:\/\/www\.w3\.org\/2000\/svg$/], // SVG namespace, not a request
-  sidepanel: [...PAGE_LINKS, /^https:\/\/github\.com\/investblog\/expired-domains\/issues$/],
+  sidepanel: [
+    ...PAGE_LINKS,
+    /^https:\/\/github\.com\/investblog\/expired-domains\/issues$/,
+    /^https:\/\/t\.me\/traffic301$/, // footer support chat (Ф16а)
+  ],
   welcome: [...PAGE_LINKS, /^https:\/\/github\.com\/investblog\/expired-domains$/],
   manifest: [/^https:\/\/301\.st$/],
 };

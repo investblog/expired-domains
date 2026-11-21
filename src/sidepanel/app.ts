@@ -14,13 +14,16 @@ import { codePointLength } from '@/shared/limits';
 import { type Request, sendRequest } from '@/shared/messages';
 import { addPreset, deletePreset, isBuiltinPreset, presetFilter, renamePreset } from '@/shared/presets';
 import { watchMeta } from '@/shared/refresh';
+import { type IconId, STORE_ICON } from '@/shared/sprite';
 import { tagKey } from '@/shared/tags';
 import { type DomainRecord, type Filter, type Patch, type Settings, STATUSES, type Status } from '@/shared/types';
-import { button, downloadText, h, icon, iconButton, logo301, nodes } from './dom';
+import { button, downloadText, h, icon, iconButton, nodes } from './dom';
 import { createDrawer } from './drawer';
 import { createFilterForm, statusLabel } from './filter-form';
+import { type ListKind, listKind } from './list-kind';
 import { type Data, domainsWithTag, listBreakdown, parseTagList, readData, stateOf, tagCounts } from './model';
-import { applyTheme, cycleTheme, getThemePreference } from './theme';
+import { initTheme, type Theme, toggleTheme, watchSystemTheme } from './theme';
+import { zoneCountry, zoneOf } from './zone';
 
 const MAX_ROWS = 500;
 const BUILTIN_NAMES: Record<string, string> = {
@@ -29,6 +32,7 @@ const BUILTIN_NAMES: Record<string, string> = {
   'working-auctions': 'presetWorkingAuctions',
 };
 const REPO_ISSUES = 'https://github.com/investblog/expired-domains/issues';
+const SUPPORT_CHAT = 'https://t.me/traffic301';
 
 const BROWSER: string = (import.meta as any).env?.BROWSER ?? 'chrome';
 
@@ -45,6 +49,64 @@ const field = (label: string, control: HTMLElement) =>
   h('label', { class: 'field' }, h('span', { class: 'field__label', text: t(label) }), control);
 const group = (legend: string, ...children: (HTMLElement | null)[]) =>
   h('fieldset', { class: 'fieldset-group' }, h('legend', { text: t(legend) }), ...children);
+const KIND_LABEL: Record<ListKind, string> = {
+  pending: 'kindPending',
+  deleted: 'kindDeleted',
+  expired: 'kindExpired',
+  auction: 'kindAuction',
+  sale: 'kindSale',
+  watchlist: 'kindWatchlist',
+  search: 'kindSearch',
+};
+const STATUS_ICON: Record<Exclude<Status, 'new'>, IconId> = {
+  shortlist: 'mono-star',
+  rejected: 'mono-close',
+  bought: 'mono-check',
+};
+/** A status as a small coloured icon; the name is its tooltip and accessible name. */
+const statusBadge = (status: Exclude<Status, 'new'>) => {
+  const label = statusLabel(t, status);
+  return h(
+    'span',
+    { class: `badge badge--icon badge--${status}`, title: label, attrs: { role: 'img', 'aria-label': label } },
+    icon(STATUS_ICON[status]),
+  );
+};
+const regionNames = (() => {
+  try {
+    return new Intl.DisplayNames([browser.i18n.getUILanguage()], { type: 'region', fallback: 'none' });
+  } catch {
+    return null;
+  }
+})();
+/**
+ * The zone's country flag, or a globe for a generic zone. The zone itself is in the name, so the
+ * mark carries no text; the country (or "generic zone") is its tooltip and accessible name.
+ */
+const zoneMark = (zone: string) => {
+  const country = zoneCountry(zone);
+  let name: string | undefined;
+  try {
+    name = country ? regionNames?.of(country.code.toUpperCase()) : undefined;
+  } catch {
+    name = undefined;
+  }
+  const label = [zone, name, country?.flag ? '' : t('zoneGeneric')].filter(Boolean).join(' · ');
+  const mark = country?.flag
+    ? h('img', { class: 'zone-flag', attrs: { src: `/flags/${country.code}.svg`, alt: '', width: '16', height: '12' } })
+    : icon('mono-web', 'icon zone-globe');
+  return h('span', { class: 'row__zone-mark', title: label, attrs: { role: 'img', 'aria-label': label } }, mark);
+};
+const MAX_ROW_TAGS = 2;
+/** Up to two tags, the rest folded into "+N" whose tooltip lists them all. */
+const rowTags = (tags: string[]) => {
+  const shown = tags.slice(0, MAX_ROW_TAGS).map((x) => h('span', { class: 'tag', text: x, title: x }));
+  if (tags.length <= MAX_ROW_TAGS) return shown;
+  return [
+    ...shown,
+    h('span', { class: 'tag tag--more', text: `+${tags.length - MAX_ROW_TAGS}`, title: tags.join(', ') }),
+  ];
+};
 const statusSelect = (value: Status = 'new') => {
   const s = h('select', {}, ...STATUSES.map((x) => h('option', { text: statusLabel(t, x), attrs: { value: x } })));
   s.value = value;
@@ -54,7 +116,7 @@ const statusSelect = (value: Status = 'new') => {
 export async function startApp(root: HTMLElement): Promise<void> {
   document.documentElement.lang = browser.i18n.getUILanguage().startsWith('ru') ? 'ru' : 'en';
   document.title = t('extName');
-  applyTheme(getThemePreference());
+  const theme = initTheme();
 
   let data: Data = readData({});
   let selection: Selection = { domains: [], excludedNoData: 0, textError: null };
@@ -73,13 +135,12 @@ export async function startApp(root: HTMLElement): Promise<void> {
 
   // ---------------------------------------------------------------- header
 
-  const themeBtn = iconButton('auto', t('popupTheme'), () => {
-    const pref = cycleTheme();
-    themeBtn.replaceChildren(icon(pref === 'light' ? 'sun' : pref === 'dark' ? 'moon' : 'auto'));
+  const themeIcon = (current: Theme) => icon(current === 'dark' ? 'mono-moon' : 'mono-sun');
+  const themeBtn = iconButton(theme === 'dark' ? 'mono-moon' : 'mono-sun', t('popupTheme'), () => {
+    themeBtn.replaceChildren(themeIcon(toggleTheme()));
   });
-  themeBtn.replaceChildren(
-    icon(getThemePreference() === 'light' ? 'sun' : getThemePreference() === 'dark' ? 'moon' : 'auto'),
-  );
+  // Until the user picks a theme the page follows the system; keep the icon in step with it.
+  watchSystemTheme((current) => themeBtn.replaceChildren(themeIcon(current)));
 
   const header = h(
     'header',
@@ -95,13 +156,13 @@ export async function startApp(root: HTMLElement): Promise<void> {
           'aria-label': '301.st',
         },
       },
-      logo301(),
+      icon('brand-301', 'logo'),
     ),
     h('h1', { class: 'title', text: t('extName') }),
     h(
       'div',
       { class: 'header__actions' },
-      iconButton('database', t('dataTitle'), () => dataDrawer.open()),
+      iconButton('mono-cog', t('dataTitle'), () => dataDrawer.open()),
       themeBtn,
     ),
   );
@@ -118,15 +179,14 @@ export async function startApp(root: HTMLElement): Promise<void> {
       spellcheck: 'false',
     },
   });
-  const searchIcon = icon('search');
-  searchIcon.classList.add('search__icon');
+  const searchIcon = icon('mono-magnify', 'icon search__icon');
   const search = h(
     'div',
     { class: 'search' },
     searchIcon,
     textInput,
     iconButton(
-      'close',
+      'mono-close',
       t('searchClear'),
       () => {
         textInput.value = '';
@@ -151,7 +211,7 @@ export async function startApp(root: HTMLElement): Promise<void> {
   const filterBtn = h(
     'button',
     { class: 'icon-btn filter-btn', attrs: { type: 'button', 'aria-haspopup': 'dialog' } },
-    icon('sliders'),
+    icon('mono-filter'),
     filterBadge,
   );
   filterBtn.addEventListener('click', () => filterDrawer.open());
@@ -288,11 +348,25 @@ export async function startApp(root: HTMLElement): Promise<void> {
       outLink(t('linkRegister'), 'https://www.expireddomains.net/register/', 'btn btn--primary'),
       outLink(t('linkSiteOpen'), 'https://www.expireddomains.net/', 'btn'),
     ),
+    // Secondary actions: 301-ui `.link--muted.link--icon`, one per line under a divider.
     h(
       'div',
-      { class: 'actions__row empty__more' },
-      outLink(t('welcomeLink'), browser.runtime.getURL('/welcome.html'), 'btn btn--link'),
-      button(t('emptyRestore'), () => dataDrawer.open(), 'btn btn--link'),
+      { class: 'empty__more' },
+      h(
+        'a',
+        {
+          class: 'link link--muted link--icon',
+          attrs: { href: browser.runtime.getURL('/welcome.html'), target: '_blank', rel: 'noopener' },
+        },
+        icon('mono-help-circle'),
+        t('welcomeLink'),
+      ),
+      h(
+        'button',
+        { class: 'link link--muted link--icon', attrs: { type: 'button' }, on: { click: () => dataDrawer.open() } },
+        icon('mono-upload'),
+        t('emptyRestore'),
+      ),
     ),
   );
 
@@ -380,19 +454,35 @@ export async function startApp(root: HTMLElement): Promise<void> {
     const box = h('input', { attrs: { type: 'checkbox', 'aria-label': domain } });
     box.checked = checked.has(domain);
     const status: Status = r.status ?? 'new';
+    // Ф8: the stats snapshot comes from the last list the domain was captured from; the row shows
+    // its kind and the zone's flag, the full list name is the row's tooltip. Layout as the 301-ui
+    // domains table: the name is the row's identity and wraps inside its column (no ellipsis),
+    // the badge column on the right is never pushed; status, tags and note get a second line
+    // only when there is one.
+    const source = data.meta.sources[r.lastSource] || r.lastSource;
+    const kind = listKind(source);
+    const zone = zoneOf(domain);
+    const extra = [
+      status !== 'new' ? statusBadge(status) : null,
+      ...rowTags(r.tags ?? []),
+      r.note ? h('span', { class: 'row__note', title: r.note }, icon('mono-note')) : null,
+    ].filter((x): x is HTMLElement => x !== null);
     const main = h(
       'div',
-      { class: 'row__main', attrs: { role: 'button', tabindex: '0', 'aria-haspopup': 'dialog' } },
+      { class: 'row__main', title: source, attrs: { role: 'button', tabindex: '0', 'aria-haspopup': 'dialog' } },
       h(
-        'div',
-        { class: 'row__line' },
-        h('span', { class: 'row__domain', text: domain }),
-        status !== 'new' ? h('span', { class: `badge badge--${status}`, text: statusLabel(t, status) }) : null,
-        ...(r.tags ?? []).map((x) => h('span', { class: 'tag', text: x })),
-        r.note ? h('span', { class: 'row__note', title: r.note }, icon('note')) : null,
+        'span',
+        { class: 'row__domain' },
+        h('span', { class: 'row__name', text: domain.slice(0, domain.length - zone.length) }),
+        zone ? h('span', { class: 'row__zone', text: zone }) : null,
       ),
-      // Ф8: the stats snapshot comes from the last list the domain was captured from.
-      h('div', { class: 'row__sub', text: data.meta.sources[r.lastSource] || r.lastSource }),
+      h(
+        'span',
+        { class: 'row__meta' },
+        kind ? h('span', { class: 'badge badge--kind', text: t(KIND_LABEL[kind]) }) : null,
+        zone ? zoneMark(zone) : null,
+      ),
+      extra.length ? h('span', { class: 'row__extra' }, ...extra) : null,
     );
     const li = h('li', { class: 'row', attrs: { 'data-domain': domain } }, box, main);
     li.classList.toggle('row--selected', box.checked);
@@ -424,6 +514,7 @@ export async function startApp(root: HTMLElement): Promise<void> {
     const tags = h('input', { attrs: { type: 'text', list: 'eds-tags', value: (r.tags ?? []).join(', ') } });
     const note = h('textarea', { attrs: { rows: '4' } });
     note.value = r.note ?? '';
+    const deleteBox = confirmBox();
     const save = async () => {
       const parsed = parseTagList(tags.value);
       if (parsed.invalid.length) return toast(t('tagInvalid', parsed.invalid[0]), 'error');
@@ -449,11 +540,14 @@ export async function startApp(root: HTMLElement): Promise<void> {
         field('editorStatus', status),
         field('editorTags', tags),
         field('editorNote', note),
+        deleteBox,
       ),
     );
     editDrawer.footer.replaceChildren(
       button(t('editorSave'), () => void save(), 'btn btn--primary'),
       button(t('editorCancel'), () => editDrawer.close(), 'btn btn--ghost'),
+      // Ф15а; the drawer closes by itself once the record is gone (reload).
+      button(t('editorDelete'), () => askDelete(deleteBox, [domain]), 'btn btn--danger-ghost editor__delete'),
     );
     editDrawer.open();
     markActiveRow();
@@ -482,6 +576,7 @@ export async function startApp(root: HTMLElement): Promise<void> {
       if (parsed.invalid.length || !parsed.tags.length) return toast(t('tagInvalid', tag.value.trim()), 'error');
       void run({ [kind]: parsed.tags });
     };
+    const deleteBox = confirmBox();
     bulkDrawer.body.replaceChildren(
       h(
         'div',
@@ -504,6 +599,24 @@ export async function startApp(root: HTMLElement): Promise<void> {
             button(t('bulkAddTag'), () => tagPatch('addTags')),
             button(t('bulkRemoveTag'), () => tagPatch('removeTags')),
           ),
+        ),
+        group(
+          'bulkDeleteLegend',
+          h(
+            'div',
+            { class: 'actions__row' },
+            button(
+              t('bulkDelete', String(checked.size)),
+              () =>
+                askDelete(deleteBox, [...checked], () => {
+                  checked.clear();
+                  bulkDrawer.close();
+                  renderResults();
+                }),
+              'btn btn--danger-ghost',
+            ),
+          ),
+          deleteBox,
         ),
       ),
     );
@@ -576,7 +689,7 @@ export async function startApp(root: HTMLElement): Promise<void> {
           confirming
             ? button(t('tagDeleteConfirm'), () => void deleteTag(x.tag), 'tag-chip__btn tag-chip__btn--danger')
             : iconButton(
-                'close',
+                'mono-close',
                 t('tagDelete', x.tag),
                 () => {
                   tagToDelete = x.tag;
@@ -601,22 +714,22 @@ export async function startApp(root: HTMLElement): Promise<void> {
   const backup = () =>
     downloadText(exportFileName('backup', new Date()), makeBackup(stateOf(data), new Date()), 'application/json');
 
-  const clearBox = h('div', { class: 'confirm' });
-  clearBox.hidden = true;
-  function showClearConfirm() {
-    clearBox.hidden = false;
-    clearBox.replaceChildren(
-      h('p', { text: t('clearQuestion', String(data.records.size)) }),
-      h('p', { class: 'muted', text: t('clearWarning') }),
+  /**
+   * Inline confirmation inside a drawer for every deletion (Ф15, Ф15а): the question, the notes,
+   * the danger button, "Save a backup first" and Cancel.
+   */
+  function showConfirm(box: HTMLElement, lines: string[], confirmLabel: string, run: () => Promise<void>) {
+    box.hidden = false;
+    box.replaceChildren(
+      ...lines.map((text, i) => h('p', { class: i ? 'muted' : undefined, text })),
       h(
         'div',
         { class: 'actions__row' },
         button(
-          t('clearConfirm', String(data.records.size)),
+          confirmLabel,
           async () => {
-            const res = await send({ type: 'eds:clear' });
-            clearBox.hidden = true;
-            toast(res.ok ? t('clearDone') : t('popupNotSaved'), res.ok ? 'ok' : 'error');
+            box.hidden = true;
+            await run();
           },
           'btn btn--danger',
         ),
@@ -624,12 +737,92 @@ export async function startApp(root: HTMLElement): Promise<void> {
         button(
           t('editorCancel'),
           () => {
-            clearBox.hidden = true;
+            box.hidden = true;
           },
           'btn btn--link',
         ),
       ),
     );
+  }
+  const confirmBox = () => {
+    const box = h('div', { class: 'confirm' });
+    box.hidden = true;
+    return box;
+  };
+
+  const clearBox = confirmBox();
+  function showClearConfirm() {
+    const n = String(data.records.size);
+    showConfirm(clearBox, [t('clearQuestion', n), t('clearWarning')], t('clearConfirm', n), async () => {
+      if (String(data.records.size) !== n) return showClearConfirm(); // the count changed meanwhile
+      const res = await send({ type: 'eds:clear' });
+      toast(res.ok ? t('clearDone') : t('popupNotSaved'), res.ok ? 'ok' : 'error');
+    });
+  }
+
+  /** Ф15а: delete the given domains after the inline confirmation in `box`. */
+  function askDelete(box: HTMLElement, domains: string[], after: () => void = () => {}) {
+    const n = String(domains.length);
+    const question = domains.length === 1 ? t('deleteOneQuestion', domains[0]) : t('deleteQuestion', n);
+    showConfirm(box, [question, t('deleteWarning')], t('clearConfirm', n), async () => {
+      const res = await send({ type: 'eds:delete', domains });
+      if (!res.ok) return toast(t('popupNotSaved'), 'error');
+      toast(t('deleteDone', String(res.result.deleted)), 'ok');
+      after();
+    });
+  }
+
+  // Ф15а: one site list at a time; a domain also captured from other lists stays.
+  const listsSection = h('div', { class: 'data-lists' });
+  const listsBox = confirmBox();
+  const listsGroup = group('dataListsLegend', listsSection, listsBox);
+  function renderDataLists() {
+    const lists = listBreakdown(data);
+    listsGroup.hidden = lists.length === 0;
+    listsSection.replaceChildren(
+      ...lists.map((l) => {
+        const clear = button(
+          t('listClear'),
+          () => askClearList(l.sourceId, l.label),
+          'btn btn--sm btn--danger-ghost',
+          t('listClearLabel', l.label),
+        );
+        // Every row's button says "Clear": the accessible name carries the list.
+        clear.setAttribute('aria-label', t('listClearLabel', l.label));
+        return h(
+          'div',
+          { class: 'data-list' },
+          h('span', { class: 'data-list__name', text: l.label, title: l.label }),
+          h('span', { class: 'data-list__count', text: String(l.count) }),
+          clear,
+        );
+      }),
+    );
+  }
+  function listCounts(sourceId: string): [only: number, shared: number] {
+    let only = 0;
+    let shared = 0;
+    for (const r of data.records.values()) {
+      if (!r.lists.includes(sourceId)) continue;
+      if (r.lists.length === 1) only++;
+      else shared++;
+    }
+    return [only, shared];
+  }
+  function askClearList(sourceId: string, label: string) {
+    const [only, shared] = listCounts(sourceId);
+    const lines = [t('listClearQuestion', label, String(only))];
+    if (shared) lines.push(t('listClearKept', String(shared)));
+    lines.push(t('deleteWarning'));
+    showConfirm(listsBox, lines, t('listClearConfirm'), async () => {
+      // Auto-capture in another tab may have changed the list while the question was open:
+      // never delete more than was announced — ask again with the new numbers.
+      const [nowOnly, nowShared] = listCounts(sourceId);
+      if (nowOnly !== only || nowShared !== shared) return askClearList(sourceId, label);
+      const res = await send({ type: 'eds:clearList', sourceId });
+      if (!res.ok) return toast(t('popupNotSaved'), 'error');
+      toast(t('listClearDone', String(res.result.deleted), String(res.result.kept)), 'ok');
+    });
   }
 
   const restoreBox = h('div', { class: 'restore' });
@@ -699,6 +892,7 @@ export async function startApp(root: HTMLElement): Promise<void> {
   dataDrawer.body.append(
     tagsGroup,
     group('dataBackupLegend', h('div', { class: 'actions__row' }, button(t('backupDownload'), backup)), restoreBox),
+    listsGroup,
     clearGroup,
   );
 
@@ -717,14 +911,24 @@ export async function startApp(root: HTMLElement): Promise<void> {
   }
   toastEl.hidden = true;
 
-  const link = (text: string, href: string) => h('a', { text, attrs: { href, target: '_blank', rel: 'noopener' } });
+  // Icon links, as in the other 301.st extensions: label in title + aria-label.
+  const link = (id: IconId, label: string, href: string) =>
+    h(
+      'a',
+      { title: label, attrs: { href, target: '_blank', rel: 'noopener', 'aria-label': label } },
+      icon(id, 'footer__icon'),
+    );
+  const sep = () => h('span', { class: 'footer__sep', attrs: { 'aria-hidden': 'true' } });
   const footer = h(
     'footer',
     { class: 'footer' },
-    link(t('welcomeLink'), browser.runtime.getURL('/welcome.html')),
-    link(t('footerRate'), storeReviewUrl()),
-    link('301.st', 'https://301.st/?utm_source=expired-domains&utm_medium=extension&utm_campaign=footer'),
-    link(t('footerIssues'), REPO_ISSUES),
+    link('mono-help-circle', t('welcomeLink'), browser.runtime.getURL('/welcome.html')),
+    sep(),
+    link(STORE_ICON, t('footerRate'), storeReviewUrl()),
+    link('brand-github', t('footerIssues'), REPO_ISSUES),
+    sep(),
+    link('brand-301', '301.st', 'https://301.st/?utm_source=expired-domains&utm_medium=extension&utm_campaign=footer'),
+    link('brand-telegram', t('footerSupport'), SUPPORT_CHAT),
   );
 
   // ---------------------------------------------------------------- data loading (Ф11, Ф16)
@@ -747,6 +951,7 @@ export async function startApp(root: HTMLElement): Promise<void> {
     renderPresets();
     renderLists();
     renderTags();
+    renderDataLists();
     const hasData = data.records.size > 0;
     clearGroup.hidden = !hasData;
     body.replaceChildren(...(hasData ? [toolbar, resultsHead, listScroll, exportBar] : [empty]));
@@ -762,6 +967,7 @@ export async function startApp(root: HTMLElement): Promise<void> {
     renderPresets();
     renderLists(); // rebuilds the list chips before a preset is loaded into the form
     renderTags();
+    renderDataLists();
     // Reload the form when the active preset changed or its stored filter changed (restore).
     const id = data.settings.activePreset;
     if (id !== prev.activePreset || filterKey(prev, id) !== filterKey(data.settings, id)) loadPreset(id);

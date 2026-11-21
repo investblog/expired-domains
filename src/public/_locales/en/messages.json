@@ -36,6 +36,9 @@
   "panelExpand": {
     "message": "Expand"
   },
+  "panelAutoOn": {
+    "message": "auto-capture is on"
+  },
   "panelSaving": {
     "message": "Saving…"
   },
@@ -107,7 +110,7 @@
     "message": "Not saved — try again"
   },
   "popupTheme": {
-    "message": "Theme: system / light / dark"
+    "message": "Switch theme (light / dark)"
   },
   "filterTextPlaceholder": {
     "message": "Text or /regex/"
@@ -231,6 +234,30 @@
   "presetError_filter": {
     "message": "Some conditions are filled in incorrectly"
   },
+  "kindPending": {
+    "message": "pending"
+  },
+  "kindDeleted": {
+    "message": "deleted"
+  },
+  "kindExpired": {
+    "message": "expired"
+  },
+  "kindAuction": {
+    "message": "auction"
+  },
+  "kindSale": {
+    "message": "buy now"
+  },
+  "kindWatchlist": {
+    "message": "watchlist"
+  },
+  "kindSearch": {
+    "message": "search"
+  },
+  "zoneGeneric": {
+    "message": "generic zone"
+  },
   "statusNew": {
     "message": "new"
   },
@@ -342,7 +369,7 @@
     "message": "Backup"
   },
   "clearAll": {
-    "message": "Clear"
+    "message": "Clear all"
   },
   "clearQuestion": {
     "message": "Delete all domains ($p1$)?",
@@ -428,6 +455,9 @@
   "footerIssues": {
     "message": "Report a problem"
   },
+  "footerSupport": {
+    "message": "Support chat (Telegram)"
+  },
   "noteTooLong": {
     "message": "The note is longer than 1000 characters"
   },
@@ -481,7 +511,7 @@
     "message": "Backup"
   },
   "dataClearLegend": {
-    "message": "Clear the list"
+    "message": "All domains"
   },
   "bulkEdit": {
     "message": "Edit…"
@@ -587,5 +617,93 @@
   },
   "welcomeLink": {
     "message": "How it works"
+  },
+  "bulkDeleteLegend": {
+    "message": "Delete"
+  },
+  "bulkDelete": {
+    "message": "Delete selected ($p1$)",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "deleteQuestion": {
+    "message": "Delete $p1$ domains?",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "deleteOneQuestion": {
+    "message": "Delete $p1$?",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "deleteWarning": {
+    "message": "Their statuses, tags and notes are deleted too. A domain captured again comes back as new. To only hide a domain, mark it rejected."
+  },
+  "deleteDone": {
+    "message": "Deleted: $p1$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "editorDelete": {
+    "message": "Delete"
+  },
+  "dataListsLegend": {
+    "message": "Lists"
+  },
+  "listClear": {
+    "message": "Clear"
+  },
+  "listClearLabel": {
+    "message": "Clear the list “$p1$”",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "listClearQuestion": {
+    "message": "Clear “$p1$”? $p2$ domains will be deleted.",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      },
+      "p2": {
+        "content": "$2"
+      }
+    }
+  },
+  "listClearKept": {
+    "message": "$p1$ more stay: they were also captured from other lists, only this list is taken off them.",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "listClearConfirm": {
+    "message": "Yes, clear"
+  },
+  "listClearDone": {
+    "message": "Deleted: $p1$, kept in other lists: $p2$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      },
+      "p2": {
+        "content": "$2"
+      }
+    }
   }
 }

@@ -68,11 +68,37 @@ export const PANEL_CSS = `
 .status[data-kind="error"] { color: var(--danger); }
 .warning { margin-bottom: 8px; padding: 6px 8px; border-radius: 6px; background: var(--warning-bg); color: var(--warning-fg); font-size: 12px; }
 .collapsed {
-  display: inline-flex; align-items: center; justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   width: 36px; height: 36px; padding: 0; border: 1px solid var(--border); border-radius: 50%;
   background: var(--bg); color: var(--primary); box-shadow: var(--shadow); cursor: pointer;
 }
-svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+/* Ф3а: auto-capture on — the launcher is filled with the primary colour (white icon: 6.3:1 light,
+   4.7:1 dark), so the mode is visible while the panel is collapsed. Hover darkens rather than
+   using --primary-hover, which is lighter in the dark theme (white on it ≈ 2.6:1). */
+.collapsed--auto { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+.collapsed--auto:hover { background: color-mix(in srgb, var(--primary) 85%, #000); }
+/* Auto-capture added new domains: one light sweep across the launcher (collapsed) or "Save page"
+   (expanded), 1.2s = SHIMMER_MS in panel.ts. overflow clips the sweep to the control's shape;
+   the control's own shadow is not clipped. */
+.collapsed, .save { position: relative; overflow: hidden; }
+.shimmer::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  /* In the text/icon colour: white on a filled control, primary on the plain launcher. */
+  background: linear-gradient(110deg, transparent 30%, color-mix(in srgb, currentColor 55%, transparent) 50%, transparent 70%);
+  transform: translateX(-100%);
+  animation: eds-shimmer 1.2s ease-in-out;
+}
+@keyframes eds-shimmer { to { transform: translateX(100%); } }
+/* Reduced motion: no sweep, a short glow that fades in place instead. */
+@media (prefers-reduced-motion: reduce) {
+  .shimmer::after {
+    background: color-mix(in srgb, currentColor 35%, transparent); transform: none;
+    animation: eds-glow 1.2s ease-out forwards;
+  }
+}
+@keyframes eds-glow { from { opacity: 1; } to { opacity: 0; } }
+/* Icons are copies of sprite symbols (src/assets/icons/mono.svg): paint comes with them. */
+svg { display: block; width: 16px; height: 16px; fill: currentColor; }
 .collapsed svg { width: 18px; height: 18px; }
 [hidden] { display: none !important; }
 `;

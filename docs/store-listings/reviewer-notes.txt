@@ -19,10 +19,10 @@ TEST STEPS
 2. Register a free account at https://www.expireddomains.net/register/ (see above), confirm the e-mail and sign in.
 3. Open "Deleted Domains" → ".com" (or any domain list). A small "Expired Domains" panel appears at the top right of the page: "On page: 25 · page 1 of N".
 4. Press "Save page". The panel reports "+25 new, 0 updated · total 25" and the toolbar badge shows 25.
-5. Open the next page of the list yourself and press "Save page" again; the total grows. Turn on "Auto-capture on page load" and open one more page: it is saved without pressing the button.
+5. Open the next page of the list yourself and press "Save page" again; the total grows. Turn on "Auto-capture on page load" and open one more page: it is saved without pressing the button. While auto-capture is on, the collapsed panel's round button is filled with colour and briefly shimmers when a page adds new domains.
 6. Click the toolbar icon. The side panel opens (Chrome and Edge: side panel; Firefox: sidebar — there is no popup). The list shows the collected domains and updates while you keep browsing.
-7. Type in the search field (for example "/^[a-z]{3,8}\.com$/"), pick a preset, or press the "Filters" button: the conditions open in a slide-out panel, and the button shows how many are active. Click a row: a panel opens to set a status, tags and a note. Tick rows or "Select all", then "Edit…" for bulk status and tags.
-8. Export with "Copy", "CSV" or "TXT" at the bottom of the side panel. The database icon in the header ("Data and backup") holds "Backup" (downloads a JSON file), "Restore from backup…" ("Merge" or "Replace all"), tag removal, and "Clear" with a confirmation.
+7. Type in the search field (for example "/^[a-z]{3,8}\.com$/"), pick a preset, or press the "Filters" button: the conditions open in a slide-out panel, and the button shows how many are active. Click a row: a panel opens to set a status, tags and a note. The same panel has "Delete" for one domain. Tick rows or "Select all", then "Edit…" for bulk status and tags, or "Delete selected (N)".
+8. Export with "Copy", "CSV" or "TXT" at the bottom of the side panel. The database icon in the header ("Data and backup") holds "Backup" (downloads a JSON file), "Restore from backup…" ("Merge" or "Replace all"), tag removal, "Lists" with "Clear" for one list (domains also captured from other lists stay), and "Clear all". Every deletion asks for confirmation first.
 
 PERMISSIONS
 
@@ -36,7 +36,7 @@ sidePanel (Chrome and Edge): the list stays open beside the site while the user 
 
 NETWORK REQUESTS
 
-None. The extension makes no network requests from any context (background, content script, side panel, welcome page). Links in the side panel and on the welcome page (301.st, the store page, GitHub, the expireddomains.net home and sign-up pages) are ordinary links opened by the user. The welcome tab is the extension's own page, opened once on install with tabs.create (no "tabs" permission).
+None. The extension makes no network requests from any context (background, content script, side panel, welcome page). Links in the side panel and on the welcome page (301.st, the store page, GitHub, the Telegram support chat, the expireddomains.net home and sign-up pages) are ordinary links opened by the user. Country flags in the list are SVG files bundled in the package. The welcome tab is the extension's own page, opened once on install with tabs.create (no "tabs" permission).
 
 DATA AND REMOTE CODE
 

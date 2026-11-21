@@ -14,6 +14,10 @@ export async function handleRequest(store: Store, msg: Request): Promise<Respons
       case 'eds:clear':
         await store.clear();
         return { ok: true, result: null };
+      case 'eds:delete':
+        return { ok: true, result: await store.delete(msg.domains) };
+      case 'eds:clearList':
+        return { ok: true, result: await store.clearList(msg.sourceId) };
       case 'eds:setSettings':
         return { ok: true, result: await store.setSettings(msg.settings) };
       case 'eds:update':

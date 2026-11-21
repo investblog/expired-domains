@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { createStore, type StorageArea } from '@/background/store';
-import { HOST_STYLE, mountPanel, NARROW_WIDTH, PANEL_HOST_ID, type PanelDeps } from '@/content/panel';
+import { HOST_STYLE, mountPanel, NARROW_WIDTH, PANEL_HOST_ID, type PanelDeps, SHIMMER_MS } from '@/content/panel';
 import { makeBackup, parseBackup } from '@/shared/backup';
 import { MAX_COLUMN_LABEL, MAX_COLUMN_TITLE, MAX_SOURCE_ID, MAX_SOURCE_LABEL } from '@/shared/limits';
 import type { Response } from '@/shared/messages';
@@ -187,6 +187,56 @@ describe('auto-capture, collapse, errors (С2, Ф3, Е3)', () => {
     expect((area.data.get('meta') as Meta).domainCount).toBe(25);
   });
 
+  it('the collapsed launcher shows the auto-capture mode and follows the stored switch (Ф3а)', async () => {
+    const on = setup(load('deleted-com-p1'), { settings: { autoCapture: true, panelCollapsed: true } });
+    expect(on.q('.collapsed').classList.contains('collapsed--auto')).toBe(true);
+    expect(on.q('.collapsed').getAttribute('aria-label')).toBe('extName — panelAutoOn — panelExpand');
+    const off = setup(load('deleted-com-p1'), { settings: { autoCapture: false, panelCollapsed: true } });
+    expect(off.q('.collapsed').classList.contains('collapsed--auto')).toBe(false);
+    expect(off.q('.collapsed').getAttribute('aria-label')).toBe('extName — panelExpand');
+    const box = off.q<HTMLInputElement>('input[type="checkbox"]');
+    box.checked = true;
+    box.dispatchEvent(new Event('change'));
+    await flush();
+    expect(off.q('.collapsed').classList.contains('collapsed--auto')).toBe(true);
+    // Not stored → the launcher does not claim the mode.
+    const failing = setup(load('deleted-com-p1'), { setSettings: async () => ({ ok: false, error: 'quota' }) });
+    const box2 = failing.q<HTMLInputElement>('input[type="checkbox"]');
+    box2.checked = true;
+    box2.dispatchEvent(new Event('change'));
+    await flush();
+    expect(failing.q('.collapsed').classList.contains('collapsed--auto')).toBe(false);
+  });
+
+  it('in auto-capture mode the launcher or "Save page" shimmers only when new domains were added (Ф3а)', async () => {
+    const shimmering = (x: { q: (s: string) => HTMLElement }, sel: string) => x.q(sel).classList.contains('shimmer');
+    const collapsed = setup(load('pendingdelete'), { settings: { autoCapture: true, panelCollapsed: true } });
+    await collapsed.handle?.autoDone;
+    expect(shimmering(collapsed, '.collapsed')).toBe(true);
+    await new Promise((r) => setTimeout(r, SHIMMER_MS + 50));
+    expect(shimmering(collapsed, '.collapsed')).toBe(false);
+    // The same page again: 0 new, only updated → no sweep.
+    collapsed.q<HTMLButtonElement>('.save').click();
+    await flush();
+    await flush();
+    expect(collapsed.q('.status').textContent).toMatch(/^panelSaved\|0\|/);
+    expect(shimmering(collapsed, '.collapsed')).toBe(false);
+
+    // Expanded panel: the sweep runs on "Save page".
+    const expanded = setup(load('pendingdelete'), { settings: { autoCapture: true, panelCollapsed: false } });
+    await expanded.handle?.autoDone;
+    expect(expanded.q('.panel').hidden).toBe(false);
+    expect(shimmering(expanded, '.save')).toBe(true);
+
+    // Auto-capture off: a manual save that adds domains gives no sweep.
+    const manual = setup(load('pendingdelete'));
+    manual.q<HTMLButtonElement>('.save').click();
+    await flush();
+    await flush();
+    expect(manual.q('.status').textContent).toMatch(/^panelSaved\|25\|/);
+    expect(shimmering(manual, '.save')).toBe(false);
+  });
+
   it('starts collapsed when narrow or remembered; toggling is remembered', () => {
     const narrow = setup(load('deleted-com-p1'), { windowWidth: NARROW_WIDTH - 1 });
     expect(narrow.q('.panel').hidden).toBe(true);
@@ -234,6 +284,38 @@ describe('auto-capture, collapse, errors (С2, Ф3, Е3)', () => {
     await flush();
     expect(stale.q('.status').textContent).toBe('panelReload');
     expect(stale.adds).toEqual([]);
+  });
+
+  it('after the extension is reloaded, i18n throws and every control still answers without an uncaught error', async () => {
+    let gone = false;
+    const unhandled: unknown[] = [];
+    const onUnhandled = (e: unknown) => unhandled.push(e);
+    process.on('unhandledRejection', onUnhandled);
+    try {
+      const orphan = setup(load('deleted-com-p1'), {
+        contextInvalidated: () => gone,
+        t: (key, ...subs) => {
+          if (gone) throw new Error('Extension context invalidated.');
+          return t(key, ...subs);
+        },
+        setSettings: async (): Promise<Response<never>> => ({ ok: false, error: 'Extension context invalidated.' }),
+      });
+      gone = true;
+      orphan.q<HTMLButtonElement>('.save').click();
+      await flush();
+      expect(orphan.q('.status').textContent).toBe('panelReload');
+      const box = orphan.q<HTMLInputElement>('input[type="checkbox"]');
+      box.checked = true;
+      box.dispatchEvent(new Event('change'));
+      orphan.q<HTMLButtonElement>('.icon-btn').click();
+      await flush();
+      await new Promise((r) => setTimeout(r, 0));
+      expect(box.checked).toBe(false);
+      expect(orphan.q('.status').textContent).toBe('panelReload');
+      expect(unhandled).toEqual([]);
+    } finally {
+      process.off('unhandledRejection', onUnhandled);
+    }
   });
 });
 

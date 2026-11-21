@@ -1,7 +1,7 @@
 // Messages to the single writer (SPEC Ф9–Ф11). The content script and the popup never write
 // storage themselves; they send one of these and wait for the answer.
 
-import type { AddResult, RestoreMode, RestoreResult, UpdateResult } from '@/background/store';
+import type { AddResult, DeleteResult, RestoreMode, RestoreResult, UpdateResult } from '@/background/store';
 import type { Capture } from './records';
 import type { Patch, Settings } from './types';
 
@@ -9,6 +9,8 @@ export type Request =
   | { type: 'eds:ensureReady' }
   | { type: 'eds:add'; capture: Capture }
   | { type: 'eds:clear' }
+  | { type: 'eds:delete'; domains: string[] }
+  | { type: 'eds:clearList'; sourceId: string }
   | { type: 'eds:setSettings'; settings: Partial<Settings> }
   | { type: 'eds:update'; domains: string[]; patch: Patch }
   | { type: 'eds:restore'; text: string; mode: RestoreMode };
@@ -17,6 +19,8 @@ export interface ResultOf {
   'eds:ensureReady': null;
   'eds:add': AddResult;
   'eds:clear': null;
+  'eds:delete': DeleteResult;
+  'eds:clearList': DeleteResult;
   'eds:setSettings': Settings;
   'eds:update': UpdateResult;
   'eds:restore': RestoreResult;

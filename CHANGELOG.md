@@ -2,7 +2,25 @@
 
 All notable changes to Expired Domains are documented here.
 
-## [0.1.0] - unreleased
+## [0.1.1] - 2026-11-21
+
+### Added
+
+- **Compact list** — one line per domain: the name with its zone dimmed (a long name wraps, never cut), the list kind and a country flag (a globe for generic zones) in a column on the right, the full list name in the tooltip; status as a small coloured icon, up to two tags and the note on a second line only when there are any
+- **Delete** the selected domains (bulk actions) or one domain from its card; **clear one list** in "Data and backup" — domains also captured from other lists stay. Each asks first and offers a backup
+- **Auto-capture indicator** — while auto-capture is on, the collapsed on-page panel's button is filled, and when a page added new domains a shimmer runs across it (or across "Save page" when the panel is expanded)
+- **301.st icon set** across the side panel, the welcome page and the on-page panel; the side panel footer is a row of icon links (how it works, rate, GitHub, 301.st, support chat)
+
+### Changed
+
+- Theme: light or dark, following the system until you switch; the separate "system" choice is gone
+- "Clear" in "Data and backup" is now "Clear all"
+
+### Fixed
+
+- After the extension was updated or reloaded, an open expireddomains.net tab no longer throws "Extension context invalidated"; the panel asks to reload the page
+
+## [0.1.0] - 2026-11-20
 
 First public version.
 

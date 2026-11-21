@@ -22,7 +22,7 @@ export function createDrawer(id: string, closeLabel: string, onClose?: () => voi
   const closeBtn = h(
     'button',
     { class: 'drawer__close', attrs: { type: 'button', 'aria-label': closeLabel, title: closeLabel } },
-    icon('close'),
+    icon('mono-close'),
   );
   const body = h('div', { class: 'drawer__body' });
   const footer = h('footer', { class: 'drawer__footer' });

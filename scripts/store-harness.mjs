@@ -27,11 +27,11 @@ const LISTS = {
   'member.expireddomains.net/domains/godaddyauctionswithbids/': 'GoDaddy Auctions with Bids',
 };
 const NAMES = [
-  'brightharbor.com', 'oakandpine.com', 'quietlakecabins.com', 'citybikeworks.net', 'learnspanishdaily.com',
-  'solarhomeguide.org', 'petvetcorner.com', 'mountaintrailmaps.com', 'freshcrumbbakery.com', 'smartgardenkit.net',
-  'nordicknits.com', 'tinyhousetales.org', 'urbanpotter.com', 'coastalkayaks.net', 'mindfulmornings.com',
-  'retroarcadehub.com', 'greenlanefarm.com', 'paperplanestudio.net', 'silverbirchlodge.com', 'homebrewlab.org',
-  'wildflowerweddings.com', 'clearviewoptics.net', 'saltandstone.com', 'buildyourdeck.com', 'nightskyphoto.org',
+  'brightharbor.com', 'oakandpine.com', 'quietlakecabins.ca', 'citybikeworks.net', 'learnspanishdaily.es',
+  'solarhomeguide.de', 'petvetcorner.com', 'mountaintrailmaps.ch', 'freshcrumbbakery.com', 'smartgardenkit.net',
+  'nordicknits.se', 'tinyhousetales.co.uk', 'urbanpotter.com', 'coastalkayaks.net', 'mindfulmornings.io',
+  'retroarcadehub.com', 'greenlanefarm.nl', 'paperplanestudio.net', 'silverbirchlodge.com', 'homebrewlab.org',
+  'wildflowerweddings.fr', 'clearviewoptics.net', 'saltandstone.com', 'buildyourdeck.com.au', 'nightskyphoto.org',
   'bookcornercafe.com', 'everydayyoga.net', 'lakesidedental.com', 'vintagemaps.org', 'sparkcodeacademy.com',
 ];
 function demoData() {
@@ -125,14 +125,14 @@ function stub(lang, theme, act) {
 
 const CAPTIONS = {
   en: [
-    ['Every list you browse, in one place', 'Save expireddomains.net list pages as you go — no duplicates, all columns, up to 10,000 domains.', ['Side panel stays open beside the site', 'Updates live while you browse', 'Statuses, tags and notes per domain']],
+    ['Every list you browse, in one place', 'Save expireddomains.net list pages as you go — no duplicates, all columns, up to 10,000 domains.', ['Side panel stays open beside the site', 'Updates live while you browse', 'Zone, flag and status at a glance']],
     ['Filter the whole collection', 'Text or /regex/, lists, availability, drop and deletion dates, auctions, BL/DP, archive age, zones.', ['Conditions in a slide-out panel', 'Built-in and your own presets', 'Export exactly what you filtered']],
-    ['Mark, tag and export', 'Shortlist, reject or mark as bought; add tags and notes; export to CSV, TXT or the clipboard.', ['Bulk actions on the whole selection', 'CSV opens in Excel', 'Backup and restore as JSON']],
+    ['Mark, tag and export', 'Shortlist, reject or mark as bought; add tags and notes; export to CSV, TXT or the clipboard.', ['Bulk edit or delete the selection', 'CSV opens in Excel', 'Backup and restore as JSON']],
   ],
   ru: [
-    ['Все просмотренные списки — в одном месте', 'Сохраняйте страницы списков expireddomains.net по ходу просмотра — без дублей, со всеми колонками, до 10 000 доменов.', ['Боковая панель рядом с сайтом', 'Обновляется по ходу просмотра', 'Статусы, теги и заметки к доменам']],
+    ['Все просмотренные списки — в одном месте', 'Сохраняйте страницы списков expireddomains.net по ходу просмотра — без дублей, со всеми колонками, до 10 000 доменов.', ['Боковая панель рядом с сайтом', 'Обновляется по ходу просмотра', 'Зона, флаг и статус — сразу видны']],
     ['Фильтруйте всю коллекцию', 'Текст или /regex/, списки, свободен/занят, даты освобождения и удаления, аукционы, BL/DP, возраст в архиве, зоны.', ['Условия в выезжающей панели', 'Встроенные и свои подборки', 'Выгрузка ровно того, что отфильтровано']],
-    ['Отмечайте, тегируйте, выгружайте', 'Отбирайте, отклоняйте, отмечайте купленные; теги и заметки; выгрузка в CSV, TXT или буфер обмена.', ['Массовые действия над выбранными', 'CSV открывается в Excel', 'Резервная копия и восстановление в JSON']],
+    ['Отмечайте, тегируйте, выгружайте', 'Отбирайте, отклоняйте, отмечайте купленные; теги и заметки; выгрузка в CSV, TXT или буфер обмена.', ['Массовая правка и удаление выбранных', 'CSV открывается в Excel', 'Резервная копия и восстановление в JSON']],
   ],
 };
 const ACTS = [null, 'filters', 'select'];

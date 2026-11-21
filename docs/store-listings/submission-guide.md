@@ -5,9 +5,9 @@ tags: [release, store, chrome, edge, firefox]
 project: expired-domains-saver
 ---
 
-# Подача в магазины — v0.1.0
+# Первая подача в магазины — v0.1.1
 
-Подготовлено 2026-11-20. Требования — [SPEC](../SPEC.md) М1–М9; раскладка как в
+Подготовлено 2026-11-20, обновлено 2026-11-21. v0.1.0 вышел только как GitHub Release; в магазины первой идёт v0.1.1. Требования — [SPEC](../SPEC.md) М1–М9; раскладка как в
 `agent-readiness`.
 
 ## Что куда загружать
@@ -37,7 +37,11 @@ project: expired-domains-saver
 - Пересъёмка:
   1. `npm run store:harness` (сборка + стенд на `http://127.0.0.1:5179`);
   2. в браузере при окне 1280×800 открыть `/shot.html?n=1..3&lang=en|ru&theme=dark|light`
-     и `/welcome.html?lang=…&act=fit`, снять кадр;
+     и `/welcome.html?lang=…&act=fit`, снять кадр. Без ручной работы — headless Chrome по
+     одному кадру за раз: `chrome --headless=new --user-data-dir=<временная папка>
+     --hide-scrollbars --force-device-scale-factor=1 --window-size=1280,800
+     --virtual-time-budget=4000 --screenshot=<файл.png> "<адрес>"` (кадры 1–2 и стартовая —
+     `theme=dark`, кадр 3 — `theme=light`);
   3. остановить стенд (Ctrl+C);
   4. `npm run promo` — плитки (большая берёт панель из `screenshot-1`).
 - **Кадр на реальном сайте** (панель «На странице: 25» поверх списка + боковая панель)
@@ -68,11 +72,9 @@ project: expired-domains-saver
    («Your account was successfully activated»). Блокер снят.
 3. **Ручные проверки A6–A11** на реальном сайте в трёх браузерах (A11 — скачивание в
    Firefox — блокирует релиз).
-4. **Публичный репозиторий** `github.com/investblog/expired-domains`: сейчас отвечает
-   «Page not found», а на него ведут «Сообщить о проблеме» в подвале, «GitHub» на стартовой
-   странице и заметки ревьюеру. Опубликовать до подачи.
-5. **Пакеты только из CI** (как в остальных расширениях): Actions → **Cut release** (для
-   v0.1.0 автоподача отключена, поле `submit` не важно) → тег после полной проверки на
+4. **Публичный репозиторий** `github.com/investblog/expired-domains` — опубликован 2026-11-20.
+5. **Пакеты только из CI** (как в остальных расширениях): Actions → **Cut release** с полем
+   `submit` = **none** (у магазинов ещё нет ID расширения — первая подача ручная) → тег после полной проверки на
    Linux → **Release** кладёт три пакета, архив исходников и `SHA256SUMS.txt` в GitHub
    Release. Локальный zip в магазин не загружать. Версия в `package.json` и `wxt.config.ts`
    должна совпадать — workflow это проверяет (М8).

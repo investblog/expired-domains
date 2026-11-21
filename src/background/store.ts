@@ -39,6 +39,11 @@ export interface UpdateResult {
   changed: number;
   overflow: number;
 }
+export interface DeleteResult {
+  deleted: number;
+  /** clearList only: domains also found in other lists, kept with this list taken off. */
+  kept: number;
+}
 export type RestoreMode = 'merge' | 'replace';
 export interface RestoreResult {
   total: number;
@@ -129,6 +134,61 @@ export function createStore(area: StorageArea, clock: () => number = Date.now) {
     await area.set({ meta: emptyMeta(meta.rev + 1) });
   }
 
+  /**
+   * Ф15а: delete some records (and/or rewrite others) by the `pending` protocol of Ф11. Step 3
+   * rebuilds `meta` from what is left, so labels no record refers to any more are dropped.
+   */
+  async function removeTask(
+    decide: (domain: string, rec: DomainRecord) => 'delete' | 'keep' | DomainRecord,
+  ): Promise<DeleteResult> {
+    const { got, meta } = await read(null);
+    const records = recordsOf(got);
+    const removed: string[] = [];
+    const rewritten: Record<string, DomainRecord> = {};
+    for (const [domain, rec] of records) {
+      const verdict = decide(domain, rec);
+      if (verdict === 'delete') {
+        removed.push(recordKey(domain));
+        records.delete(domain);
+      } else if (verdict !== 'keep') {
+        rewritten[recordKey(domain)] = verdict;
+        records.set(domain, verdict);
+      }
+    }
+    const kept = Object.keys(rewritten).length;
+    if (removed.length === 0 && kept === 0) {
+      await area.set({ meta: { ...meta, rev: meta.rev + 1 } });
+      return { deleted: 0, kept: 0 };
+    }
+    await area.set({ meta: { ...meta, pending: true } });
+    if (removed.length) await area.remove(removed);
+    if (kept) await area.set(rewritten);
+    await area.set({ meta: rebuildMeta(meta, records.values()) });
+    return { deleted: removed.length, kept };
+  }
+
+  function deleteTask(domains: unknown): Promise<DeleteResult> {
+    if (!Array.isArray(domains) || !domains.every((d) => typeof d === 'string'))
+      throw new StoreError('invalid domains');
+    const wanted = new Set(domains);
+    return removeTask((domain) => (wanted.has(domain) ? 'delete' : 'keep'));
+  }
+
+  /**
+   * Clear one site list: domains seen only there are deleted; a domain also seen in other lists
+   * stays with this list taken off. Its stats snapshot stays, and if it came from this list the
+   * last remaining list becomes its source (`lastSource ∈ lists`, Ф7).
+   */
+  function clearListTask(sourceId: unknown): Promise<DeleteResult> {
+    if (typeof sourceId !== 'string' || sourceId === '') throw new StoreError('invalid list');
+    return removeTask((_, rec) => {
+      if (!rec.lists.includes(sourceId)) return 'keep';
+      const lists = rec.lists.filter((s) => s !== sourceId);
+      if (lists.length === 0) return 'delete';
+      return { ...rec, lists, lastSource: rec.lastSource === sourceId ? lists[lists.length - 1] : rec.lastSource };
+    });
+  }
+
   async function setSettingsTask(partial: Partial<Settings>): Promise<Settings> {
     const { got, meta } = await read(['settings']);
     const settings = { ...(got.settings as Settings), ...partial };
@@ -215,6 +275,8 @@ export function createStore(area: StorageArea, clock: () => number = Date.now) {
     ensureReady: () => enqueue(ensureReadyTask),
     add: (capture: Capture) => enqueue(() => addTask(capture)),
     clear: () => enqueue(clearTask),
+    delete: (domains: string[]) => enqueue(() => deleteTask(domains)),
+    clearList: (sourceId: string) => enqueue(() => clearListTask(sourceId)),
     setSettings: (partial: Partial<Settings>) => enqueue(() => setSettingsTask(partial)),
     update: (domains: string[], patch: unknown) => enqueue(() => updateTask(domains, patch)),
     restore: (text: string, mode: RestoreMode) => enqueue(() => restoreTask(text, mode)),

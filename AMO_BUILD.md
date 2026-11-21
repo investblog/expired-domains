@@ -30,6 +30,10 @@ dist/expired-domains-<version>-firefox.zip
 The unpacked build is written to `dist/firefox-mv2/`. The second ZIP created by WXT is the
 source archive and is not part of the extension package.
 
+Country flags in `src/public/flags/` are committed SVG files copied into the package as they
+are. They are taken from the open-source `flag-icons` package (MIT) and minified with SVGO by
+`scripts/build-flags.mjs`; the Firefox build does not run that script.
+
 The build performs ordinary TypeScript transpilation and bundling. Source code is not
 obfuscated and the extension downloads no remote code at runtime. It makes no network
 requests at all; `npm run check` fails if a network API appears in the built files.

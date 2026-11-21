@@ -312,6 +312,61 @@ describe('update (Ф23, A14)', () => {
   });
 });
 
+describe('delete and clear one list (Ф15а)', () => {
+  it('delete removes the chosen records with their user fields; meta drops labels nobody uses', async () => {
+    const store = createStore(local(), clock);
+    await store.add(capture(A, ['a.com', 'b.com'], { bl: '1' }));
+    await store.add(capture(B, ['w.com'], { dp: '2' }));
+    await store.update(['a.com'], { status: 'shortlist', addTags: ['x'] });
+    const rev = (await dump()).meta.rev;
+    expect(await store.delete(['a.com', 'w.com', 'missing.com'])).toEqual({ deleted: 2, kept: 0 });
+    const s = await dump();
+    expect(Object.keys(s.records)).toEqual(['b.com']);
+    expect(s.meta).toMatchObject({ domainCount: 1, sources: { [A]: 'Deleted .com Domains' }, rev: rev + 1 });
+    expect(s.meta.sources[B]).toBeUndefined();
+    expect(Object.keys(s.meta.columns)).toEqual(['bl']);
+    expect(s.meta.pending).toBeUndefined();
+    await expect(store.delete('a.com' as unknown as string[])).rejects.toThrow(/domains/);
+  });
+
+  it('clearing a list deletes domains seen only there and keeps the others without it', async () => {
+    const store = createStore(local(), clock);
+    await store.add(capture(A, ['only-a.com', 'both.com', 'both2.com']));
+    await store.add(capture(B, ['both.com', 'only-b.com']));
+    now += 1;
+    await store.add(capture(A, ['both2.com'])); // last captured from A, also in B below
+    await store.add(capture(B, ['both2.com']));
+    await store.add(capture(A, ['both2.com']));
+    await store.update(['both.com'], { note: 'keep me' });
+    expect(await store.clearList(A)).toEqual({ deleted: 1, kept: 2 });
+    const s = await dump();
+    expect(Object.keys(s.records).sort()).toEqual(['both.com', 'both2.com', 'only-b.com']);
+    expect(s.records['both.com']).toMatchObject({ lists: [B], lastSource: B, note: 'keep me' });
+    // The snapshot came from A: it stays, and the remaining list becomes its source (lastSource ∈ lists).
+    expect(s.records['both2.com']).toMatchObject({ lists: [B], lastSource: B, stats: { bl: '1' } });
+    expect(s.meta.sources[A]).toBeUndefined();
+    expect(s.meta.domainCount).toBe(3);
+    expect(await store.clearList('nope')).toEqual({ deleted: 0, kept: 0 });
+  });
+
+  it('an interrupted delete leaves pending; the restart rebuilds meta from what is left', async () => {
+    const store = createStore(local(), clock);
+    await store.add(capture(A, ['a.com', 'b.com', 'c.com']));
+    const io = instrumented();
+    io.failRemove(true);
+    expect(await handleRequest(createStore(io.area, clock), { type: 'eds:delete', domains: ['a.com'] })).toEqual({
+      ok: false,
+      error: 'remove failed',
+    });
+    expect((await dump()).meta.pending).toBe(true);
+    await createStore(local(), clock).ensureReady();
+    expect((await dump()).meta).toMatchObject({ domainCount: 3 });
+    expect((await dump()).meta.pending).toBeUndefined();
+    expect(await createStore(local(), clock).delete(['a.com'])).toEqual({ deleted: 1, kept: 0 });
+    expect((await dump()).meta.domainCount).toBe(2);
+  });
+});
+
 describe('restore (Ф27, A15 storage part)', () => {
   const CLOCK = new Date(Date.UTC(2026, 10, 20));
   async function snapshotState(): Promise<State> {

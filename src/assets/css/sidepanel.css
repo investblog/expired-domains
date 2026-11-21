@@ -17,7 +17,8 @@ body {
 
 .app { display: flex; flex-direction: column; height: 100%; }
 
-.icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+/* Sprite icons (src/assets/icons): paint is set inside each symbol, CSS sets size and colour only. */
+.icon { width: 16px; height: 16px; flex-shrink: 0; fill: currentColor; }
 .logo { width: 20px; height: 20px; display: block; }
 .muted { color: var(--muted); }
 .error { color: var(--danger); }
@@ -35,13 +36,16 @@ body {
 .brand { display: inline-flex; }
 .title { flex: 1; margin: 0; font-size: var(--fs-md); font-weight: var(--fw-semibold); }
 .header__actions { display: flex; gap: var(--space-1); }
+/* Footer: icon links as in the other 301.st extensions (dimmed until hover or focus). */
 .footer {
-  display: flex; flex-wrap: wrap; gap: 2px var(--space-3); justify-content: center; flex-shrink: 0;
-  padding: var(--space-1) var(--space-3);
-  border-top: 1px solid var(--border-subtle); background: var(--bg-elevated); font-size: var(--fs-xs);
+  display: flex; align-items: center; justify-content: center; gap: var(--space-2); flex-shrink: 0;
+  padding: var(--space-2) var(--space-3);
+  border-top: 1px solid var(--border-subtle); background: var(--bg-elevated);
 }
-.footer a { color: var(--muted); text-decoration: none; }
-.footer a:hover { color: var(--primary); }
+.footer a { display: inline-flex; color: var(--text); opacity: 0.45; transition: opacity var(--transition-fast); }
+.footer a:hover, .footer a:focus-visible { opacity: 1; }
+.footer__icon { width: 16px; height: 16px; fill: currentColor; }
+.footer__sep { width: 1px; height: 12px; background: var(--border-strong); flex-shrink: 0; }
 
 /* ---- controls ---- */
 .btn {
@@ -135,7 +139,7 @@ input[type="checkbox"] { accent-color: var(--primary); }
 .results__head--bulk { background: var(--primary-soft); }
 .results__count { flex: 1; font-weight: var(--fw-medium); }
 .bulk__count { flex: 1; font-weight: var(--fw-semibold); }
-.list-scroll { flex: 1; min-height: 0; overflow-y: auto; }
+.list-scroll { flex: 1; min-height: 0; overflow-y: auto; container: list / inline-size; }
 .list { list-style: none; margin: 0; padding: 0; }
 .row {
   display: grid; grid-template-columns: auto 1fr; align-items: start; gap: 0 var(--space-2);
@@ -146,17 +150,40 @@ input[type="checkbox"] { accent-color: var(--primary); }
 .row--selected { background: var(--primary-soft); }
 .row--active { box-shadow: inset 3px 0 0 var(--primary); }
 .row > input { margin-top: 3px; }
-.row__main { min-width: 0; cursor: pointer; border-radius: var(--radius-xs); }
-.row__line { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1); }
-.row__domain { font-weight: var(--fw-medium); overflow-wrap: anywhere; }
-.row__sub { font-size: var(--fs-xs); color: var(--muted); }
+/* Row as in the 301-ui domains table (Ф8): the name column takes the rest and wraps inside itself
+   (the name is the row's identity: no ellipsis), the badge column keeps its width and stays on
+   the first line, the status / tags / note line exists only when it has content. */
+.row__main {
+  min-width: 0; cursor: pointer; border-radius: var(--radius-xs);
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: var(--space-2); row-gap: 2px;
+  align-items: start;
+}
+.row__domain { overflow-wrap: anywhere; }
+.row__name { font-weight: var(--fw-semibold); }
+.row__zone { color: var(--muted); }
+.row__meta { display: inline-flex; align-items: center; gap: var(--space-1); padding-top: 2px; }
+.row__extra { grid-column: 1; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1); }
 .row__note { color: var(--muted); display: inline-flex; }
 .row__note .icon { width: 14px; height: 14px; }
-.badge { font-size: var(--fs-xs); padding: 0 var(--space-2); border-radius: var(--r-pill); }
+.row__zone-mark { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; color: var(--muted); }
+/* Low-priority column (301-ui column priorities, thresholds for a side panel): the list kind goes
+   first on a narrow panel; the full list name stays in the row's tooltip. */
+@container list (max-width: 340px) {
+  .badge--kind { display: none; }
+}
+.badge { font-size: var(--fs-xs); line-height: 18px; padding: 0 var(--space-2); border-radius: var(--r-pill); white-space: nowrap; }
+.badge--icon { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; padding: 0; }
+.badge--icon .icon { width: 11px; height: 11px; }
 .badge--shortlist { background: var(--success-bg); color: var(--success); }
 .badge--rejected { background: var(--danger-bg); color: var(--danger); }
 .badge--bought { background: var(--primary-soft); color: var(--primary-hover); }
+.badge--kind { background: var(--bg-soft); color: var(--muted); }
+/* Flags keep their own colours; a hairline keeps white flags visible on a light row. */
+.zone-flag { width: 16px; height: 12px; flex-shrink: 0; border-radius: 2px; box-shadow: 0 0 0 1px var(--border-subtle); }
+.row__zone-mark .zone-globe { width: 14px; height: 14px; }
 .tag { font-size: var(--fs-xs); padding: 0 var(--space-1); border: 1px solid var(--border-strong); border-radius: var(--radius-xs); color: var(--muted); }
+/* In a row a tag is not the identity: a long one is cut, its full text is the tooltip. */
+.row__extra .tag { max-width: 10em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .more { padding: var(--space-2) var(--space-3); font-size: var(--fs-xs); }
 .more:empty { display: none; }
 
@@ -174,8 +201,21 @@ input[type="checkbox"] { accent-color: var(--primary); }
 .empty__title { margin: 0 0 var(--space-2); font-size: var(--fs-lg); font-weight: var(--fw-semibold); }
 .empty p { margin: 0 0 var(--space-3); }
 .empty__steps { margin: 0 0 var(--space-4); padding-left: 1.3em; display: flex; flex-direction: column; gap: var(--space-2); }
-.empty__more { margin-top: var(--space-3); }
-.empty__more .btn--link { padding: 0; }
+.empty__more {
+  display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2);
+  margin-top: var(--space-4); padding-top: var(--space-3); border-top: 1px solid var(--border-subtle);
+}
+
+/* Links, as 301-ui site.css "Links (global styles)"; a <button> may wear them too. */
+.link {
+  padding: 0; border: 0; background: none; font: inherit; font-size: var(--fs-sm); cursor: pointer;
+  color: var(--primary); text-decoration: none; transition: color var(--transition-fast);
+}
+.link:hover { color: var(--primary-hover); }
+.link--muted { color: var(--text-muted); }
+.link--muted:hover { color: var(--primary); }
+.link--icon { display: inline-flex; align-items: center; gap: 0.35em; }
+.link--icon .icon { width: 1.15em; height: 1.15em; }
 
 /* ---- drawer (301-ui pattern, as in redirect-inspector) ---- */
 .drawer { position: fixed; inset: 0; z-index: 50; display: flex; justify-content: flex-end; overflow: hidden; }
@@ -236,6 +276,12 @@ input[type="checkbox"] { accent-color: var(--primary); }
 .tag-chip__btn .icon { width: 12px; height: 12px; }
 .tag-chip__btn--danger { width: auto; padding: 0 var(--space-2); color: var(--danger); font-weight: var(--fw-semibold); }
 .confirm { padding: var(--space-2); border-radius: var(--radius); background: var(--danger-bg); }
+/* Data drawer → Lists (Ф15а): name (cut, full in the tooltip), count, Clear. */
+.data-lists { display: flex; flex-direction: column; gap: var(--space-1); margin-bottom: var(--space-2); }
+.data-list { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: var(--space-2); }
+.data-list__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.data-list__count { color: var(--muted); font-variant-numeric: tabular-nums; }
+.editor__delete { margin-left: auto; }
 .confirm p { margin: 0 0 var(--space-1); }
 .restore { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
 .restore__info { flex-basis: 100%; }

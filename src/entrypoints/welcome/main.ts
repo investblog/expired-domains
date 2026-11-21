@@ -3,8 +3,8 @@
 // never seen expireddomains.net. Links only; the page sends no requests (I1).
 
 import { t } from '@/shared/i18n';
-import { svgIcon } from '@/shared/svg';
-import { applyTheme, getThemePreference } from '@/sidepanel/theme';
+import { type IconId, icon, STORE_ICON } from '@/shared/sprite';
+import { initTheme } from '@/sidepanel/theme';
 
 const BROWSER: string = (import.meta as any).env?.BROWSER ?? 'chrome';
 const SITE_URL = 'https://www.expireddomains.net/';
@@ -26,15 +26,15 @@ function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls: string, text?: s
   return node;
 }
 
-function link(text: string, href: string, cls: string): HTMLAnchorElement {
-  const a = el('a', cls, text);
+function link(text: string, href: string, cls: string, glyph?: IconId): HTMLAnchorElement {
+  const a = el('a', cls);
+  if (glyph) a.append(icon(glyph));
+  a.append(text);
   a.href = href;
   a.target = '_blank';
   a.rel = 'noopener';
   return a;
 }
-
-const PANEL_ICON = 'M4 3h16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2m10 2H4v14h10zm2 0v14h4V5z';
 
 // sidePanel.open must run while the click's user gesture is active: the window id is read at load.
 let windowId: number | undefined;
@@ -61,12 +61,12 @@ function openPanel(): boolean {
 
 function render(app: HTMLElement): void {
   const header = el('header', 'welcome__header');
-  const icon = el('img', 'welcome__icon');
-  icon.src = '/icons/48.png';
-  icon.alt = '';
+  const appIcon = el('img', 'welcome__icon');
+  appIcon.src = '/icons/48.png';
+  appIcon.alt = '';
   const head = el('div', '');
   head.append(el('h1', 'welcome__title', t('extName')), el('p', 'welcome__tagline', t('welTagline')));
-  header.append(icon, head);
+  header.append(appIcon, head);
 
   const what = el('section', 'welcome-card');
   what.append(
@@ -107,7 +107,7 @@ function render(app: HTMLElement): void {
   const hero = el('section', 'welcome-card');
   const openBtn = el('button', 'welcome-btn');
   openBtn.type = 'button';
-  openBtn.append(svgIcon(document, [['path', { d: PANEL_ICON, fill: 'currentColor' }]]), t('welOpenPanel'));
+  openBtn.append(icon('mono-side-panel'), t('welOpenPanel'));
   const openHint = el('p', 'welcome__hint', t('welPinHint'));
   openBtn.addEventListener('click', () => {
     if (!openPanel()) openHint.textContent = t('welOpenPanelManual');
@@ -128,9 +128,9 @@ function render(app: HTMLElement): void {
   const privacy = el('section', 'welcome-card');
   const links = el('div', 'welcome__links');
   links.append(
-    link(t('footerRate'), storeReviewUrl(), 'welcome-chip'),
-    link('GitHub', REPO_URL, 'welcome-chip'),
-    link('301.st', URL_301, 'welcome-chip'),
+    link(t('footerRate'), storeReviewUrl(), 'welcome-chip', STORE_ICON),
+    link('GitHub', REPO_URL, 'welcome-chip', 'brand-github'),
+    link('301.st', URL_301, 'welcome-chip', 'brand-301'),
   );
   privacy.append(
     el('h2', 'welcome-card__title', t('welPrivacyTitle')),
@@ -144,6 +144,6 @@ function render(app: HTMLElement): void {
 
 document.documentElement.lang = browser.i18n.getUILanguage().startsWith('ru') ? 'ru' : 'en';
 document.title = t('extName');
-applyTheme(getThemePreference());
+initTheme();
 const root = document.getElementById('app');
 if (root) render(root);

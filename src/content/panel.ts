@@ -3,17 +3,19 @@
 // Dependencies are injected so the panel runs in tests without the extension runtime.
 
 import type { AddResult } from '@/background/store';
+import { inlineIcon } from '@/shared/icons';
 import type { Response } from '@/shared/messages';
 import { type ParseResult, parseListing } from '@/shared/parse';
 import type { Capture } from '@/shared/records';
 import type { Source } from '@/shared/source';
-import { type SvgShape, svgIcon } from '@/shared/svg';
 import type { Settings } from '@/shared/types';
 import { PANEL_CSS } from './panel-css';
 
 export const PANEL_HOST_ID = 'expired-domains-panel-301st';
 /** Below this window width the panel starts collapsed (Ф3). */
 export const NARROW_WIDTH = 1000;
+/** Length of the launcher sweep after new domains were added (Ф3а); matches panel-css.ts. */
+export const SHIMMER_MS = 1200;
 
 export interface PanelDeps {
   doc: Document;
@@ -34,8 +36,6 @@ export interface PanelHandle {
   /** Resolves when the automatic capture (if any) has finished. */
   autoDone: Promise<void>;
 }
-const ICON_LIST: SvgShape[] = [['path', { d: 'M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01' }]];
-const ICON_MINUS: SvgShape[] = [['path', { d: 'M5 12h14' }]];
 
 /** Host element styles, applied inline with `!important` (`all` first, longhands after it). */
 export const HOST_STYLE: [string, string][] = [
@@ -56,7 +56,8 @@ export const HOST_STYLE: [string, string][] = [
   ['opacity', '1'],
   ['visibility', 'visible'],
   ['pointer-events', 'auto'],
-  ['contain', 'content'],
+  // No paint containment: it clips the button's and the panel's shadow to the host box.
+  ['contain', 'layout style'],
   ['font', '13px/1.45 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'],
   ['color-scheme', 'light dark'],
   ['color', 'var(--text)'],
@@ -102,9 +103,19 @@ export function mountPanel(deps: PanelDeps): PanelHandle | null {
   // Collapsed icon.
   const collapsedBtn = el('button', 'collapsed');
   collapsedBtn.type = 'button';
-  collapsedBtn.append(svgIcon(doc, ICON_LIST, undefined, ''));
-  collapsedBtn.title = `${t('extName')} — ${t('panelExpand')}`;
-  collapsedBtn.setAttribute('aria-label', collapsedBtn.title);
+  collapsedBtn.append(inlineIcon(doc, 'list'));
+  // Ф3а: while auto-capture is on the launcher is filled and says so, so a collapsed panel does
+  // not hide the mode. Both labels are read now, while the extension context is alive.
+  const LAUNCHER_LABEL = `${t('extName')} — ${t('panelExpand')}`;
+  const LAUNCHER_AUTO_LABEL = `${t('extName')} — ${t('panelAutoOn')} — ${t('panelExpand')}`;
+  let autoOn = deps.settings.autoCapture;
+  const showAutoMode = (on: boolean) => {
+    autoOn = on;
+    collapsedBtn.classList.toggle('collapsed--auto', on);
+    collapsedBtn.title = on ? LAUNCHER_AUTO_LABEL : LAUNCHER_LABEL;
+    collapsedBtn.setAttribute('aria-label', collapsedBtn.title);
+  };
+  showAutoMode(autoOn);
 
   // Expanded panel.
   const panel = el('div', 'panel');
@@ -114,7 +125,7 @@ export function mountPanel(deps: PanelDeps): PanelHandle | null {
   const title = el('div', 'title', t('extName'));
   const collapseBtn = el('button', 'icon-btn');
   collapseBtn.type = 'button';
-  collapseBtn.append(svgIcon(doc, ICON_MINUS, undefined, ''));
+  collapseBtn.append(inlineIcon(doc, 'minus'));
   collapseBtn.title = t('panelCollapse');
   collapseBtn.setAttribute('aria-label', collapseBtn.title);
   head.append(title, collapseBtn);
@@ -132,6 +143,12 @@ export function mountPanel(deps: PanelDeps): PanelHandle | null {
   status.setAttribute('role', 'status');
   panel.append(head, warning, info, save, auto, status);
   root.append(collapsedBtn, panel);
+
+  // Read while the extension is alive: after it is reloaded or updated, this orphaned script's
+  // i18n.getMessage throws "Extension context invalidated", and these are the texts shown then.
+  const RELOAD = t('panelReload');
+  const NOT_SAVED = t('panelNotSaved');
+  const failText = () => (deps.contextInvalidated() ? RELOAD : NOT_SAVED);
 
   const setStatus = (text: string, kind: 'ok' | 'error' | '' = '') => {
     status.textContent = text;
@@ -154,11 +171,25 @@ export function mountPanel(deps: PanelDeps): PanelHandle | null {
     collapsedBtn.hidden = !collapsed;
   };
 
+  /**
+   * Ф3а: in auto-capture mode, a capture that added new domains (never for 0 new) sends one sweep
+   * across the control on screen — the launcher when collapsed, "Save page" when expanded.
+   */
+  let shimmerTimer: ReturnType<typeof setTimeout> | undefined;
+  const shimmer = () => {
+    const targets = [collapsedBtn, save];
+    for (const x of targets) x.classList.add('shimmer');
+    clearTimeout(shimmerTimer);
+    shimmerTimer = setTimeout(() => {
+      for (const x of targets) x.classList.remove('shimmer');
+    }, SHIMMER_MS);
+  };
+
   let busy = false;
   async function capture(): Promise<void> {
     if (busy) return;
     if (deps.contextInvalidated()) {
-      setStatus(t('panelReload'), 'error');
+      setStatus(RELOAD, 'error');
       return;
     }
     // С2: the table is re-read at the moment of saving.
@@ -178,8 +209,9 @@ export function mountPanel(deps: PanelDeps): PanelHandle | null {
       if (res.ok) {
         const { added, updated, total } = res.result;
         setStatus(t('panelSaved', String(added), String(updated), String(total)), 'ok');
+        if (autoOn && added > 0) shimmer();
       } else {
-        setStatus(deps.contextInvalidated() ? t('panelReload') : t('panelNotSaved'), 'error');
+        setStatus(failText(), 'error');
       }
     } finally {
       busy = false;
@@ -192,13 +224,14 @@ export function mountPanel(deps: PanelDeps): PanelHandle | null {
   async function storeSetting(partial: Partial<Settings>): Promise<boolean> {
     const res = await deps.setSettings(partial).catch((): Response<unknown> => ({ ok: false, error: 'closed' }));
     if (res.ok) return true;
-    setStatus(deps.contextInvalidated() ? t('panelReload') : t('panelNotSaved'), 'error');
+    setStatus(failText(), 'error');
     return false;
   }
   autoBox.addEventListener('change', async () => {
     // Applies from the next page the user opens (С2); this page is saved with the button.
     const wanted = autoBox.checked;
-    if (!(await storeSetting({ autoCapture: wanted }))) autoBox.checked = !wanted;
+    if (await storeSetting({ autoCapture: wanted })) showAutoMode(wanted);
+    else autoBox.checked = !wanted;
   });
   const toggle = (value: boolean) => {
     collapsed = value;

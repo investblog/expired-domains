@@ -36,6 +36,9 @@
   "panelExpand": {
     "message": "Развернуть"
   },
+  "panelAutoOn": {
+    "message": "автосбор включён"
+  },
   "panelSaving": {
     "message": "Сохранение…"
   },
@@ -107,7 +110,7 @@
     "message": "Не сохранено — повторите"
   },
   "popupTheme": {
-    "message": "Тема: системная / светлая / тёмная"
+    "message": "Сменить тему (светлая / тёмная)"
   },
   "filterTextPlaceholder": {
     "message": "Текст или /regex/"
@@ -231,6 +234,30 @@
   "presetError_filter": {
     "message": "Часть условий заполнена неверно"
   },
+  "kindPending": {
+    "message": "к удалению"
+  },
+  "kindDeleted": {
+    "message": "удалён"
+  },
+  "kindExpired": {
+    "message": "истёк"
+  },
+  "kindAuction": {
+    "message": "аукцион"
+  },
+  "kindSale": {
+    "message": "продажа"
+  },
+  "kindWatchlist": {
+    "message": "наблюдение"
+  },
+  "kindSearch": {
+    "message": "поиск"
+  },
+  "zoneGeneric": {
+    "message": "общая зона"
+  },
   "statusNew": {
     "message": "новый"
   },
@@ -342,7 +369,7 @@
     "message": "Резервная копия"
   },
   "clearAll": {
-    "message": "Очистить"
+    "message": "Очистить всё"
   },
   "clearQuestion": {
     "message": "Удалить все домены ($p1$)?",
@@ -428,6 +455,9 @@
   "footerIssues": {
     "message": "Сообщить о проблеме"
   },
+  "footerSupport": {
+    "message": "Чат поддержки (Telegram)"
+  },
   "noteTooLong": {
     "message": "Заметка длиннее 1000 символов"
   },
@@ -481,7 +511,7 @@
     "message": "Резервная копия"
   },
   "dataClearLegend": {
-    "message": "Очистка списка"
+    "message": "Все домены"
   },
   "bulkEdit": {
     "message": "Изменить…"
@@ -587,5 +617,93 @@
   },
   "welcomeLink": {
     "message": "Как это работает"
+  },
+  "bulkDeleteLegend": {
+    "message": "Удаление"
+  },
+  "bulkDelete": {
+    "message": "Удалить выбранные ($p1$)",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "deleteQuestion": {
+    "message": "Удалить домены ($p1$)?",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "deleteOneQuestion": {
+    "message": "Удалить $p1$?",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "deleteWarning": {
+    "message": "Их статусы, теги и заметки тоже удалятся. Если домен снова соберут, он вернётся как новый. Чтобы только скрыть домен, отметьте его «отклонён»."
+  },
+  "deleteDone": {
+    "message": "Удалено: $p1$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "editorDelete": {
+    "message": "Удалить"
+  },
+  "dataListsLegend": {
+    "message": "Списки"
+  },
+  "listClear": {
+    "message": "Очистить"
+  },
+  "listClearLabel": {
+    "message": "Очистить список «$p1$»",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "listClearQuestion": {
+    "message": "Очистить «$p1$»? Удалится доменов: $p2$.",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      },
+      "p2": {
+        "content": "$2"
+      }
+    }
+  },
+  "listClearKept": {
+    "message": "Ещё $p1$ останутся: они собраны и с других списков, у них уберётся только этот список.",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      }
+    }
+  },
+  "listClearConfirm": {
+    "message": "Да, очистить"
+  },
+  "listClearDone": {
+    "message": "Удалено: $p1$, осталось в других списках: $p2$",
+    "placeholders": {
+      "p1": {
+        "content": "$1"
+      },
+      "p2": {
+        "content": "$2"
+      }
+    }
   }
 }

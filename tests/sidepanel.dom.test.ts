@@ -121,6 +121,34 @@ describe('side panel smoke', () => {
     for (const a of empty.querySelectorAll('a')) expect(a.getAttribute('target')).toBe('_blank');
   });
 
+  it('the footer is a row of labelled icon links from the sprite (Ф16а)', async () => {
+    await open();
+    const links = Array.from(root.querySelectorAll<HTMLAnchorElement>('.footer a'));
+    expect(links.map((a) => [a.getAttribute('aria-label'), a.querySelector('use')?.getAttribute('href')])).toEqual([
+      ['welcomeLink', '#i-mono-help-circle'],
+      ['footerRate', '#i-brand-chrome'],
+      ['footerIssues', '#i-brand-github'],
+      ['301.st', '#i-brand-301'],
+      ['footerSupport', '#i-brand-telegram'],
+    ]);
+    expect(links.map((a) => a.getAttribute('href'))).toEqual([
+      'chrome-extension://test-id/welcome.html',
+      'https://chromewebstore.google.com/detail/test-id/reviews',
+      'https://github.com/investblog/expired-domains/issues',
+      'https://301.st/?utm_source=expired-domains&utm_medium=extension&utm_campaign=footer',
+      'https://t.me/traffic301',
+    ]);
+    for (const a of links) {
+      expect(a.title).toBe(a.getAttribute('aria-label'));
+      expect(a.getAttribute('target')).toBe('_blank');
+    }
+    // Every <use> in the panel points at a symbol of the one sprite in the document.
+    expect(document.querySelectorAll('#eds-icon-sprite')).toHaveLength(1);
+    for (const use of document.querySelectorAll('use')) {
+      expect(document.getElementById(use.getAttribute('href')!.slice(1))?.localName).toBe('symbol');
+    }
+  });
+
   it('lists domains with the default view; rejected are hidden (Ф13, A12)', async () => {
     await env.store.add(capture(['a.com', 'b.com', 'c.com']));
     await env.store.update(['b.com'], { status: 'rejected' });
@@ -194,9 +222,48 @@ describe('side panel smoke', () => {
     byText(drawer('editor'), 'button', 'editorSave').click();
     await settle();
     expect(env.data.get('d:a.com')).toMatchObject({ status: 'bought', tags: ['Client A', 'x'], note: 'call "owner"' });
-    expect(root.querySelector('.badge--bought')).not.toBeNull();
+    const bought = root.querySelector('.badge--bought') as HTMLElement;
+    expect(bought.getAttribute('aria-label')).toBe('statusBought');
+    expect(bought.querySelector('use')?.getAttribute('href')).toBe('#i-mono-check');
+    // The list kind and the zone's mark sit in the right column; status, tags and note on the
+    // second line; the full list name is the row's tooltip (Ф8).
+    const main = root.querySelector('.row__main') as HTMLElement;
+    expect(main.title).toBe('Deleted .com Domains');
+    expect(main.querySelector('.row__name')?.textContent).toBe('a');
+    expect(main.querySelector('.row__zone')?.textContent).toBe('.com');
+    expect(main.querySelector('.row__meta .badge--kind')?.textContent).toBe('kindDeleted');
+    expect(main.querySelector('.row__meta .row__zone-mark')).not.toBeNull();
+    expect(Array.from(main.querySelectorAll('.row__extra .tag'), (b) => b.textContent)).toEqual(['Client A', 'x']);
+    expect(main.querySelector('.row__extra .badge--bought')).not.toBeNull();
+    expect(main.querySelector('.row__extra .row__note')).not.toBeNull();
     expect(drawer('editor').hidden).toBe(true); // an editor drawer saves and closes
     expect(root.querySelector('.row--active')).toBeNull();
+  });
+
+  it('a row without status, tags or note has no second line; more than two tags fold into "+N"', async () => {
+    await env.store.add(capture(['plain.com', 'tagged.com']));
+    await env.store.update(['tagged.com'], { addTags: ['one', 'two', 'three', 'four'] });
+    await open();
+    const row = (d: string) => root.querySelector(`.row[data-domain="${d}"]`) as HTMLElement;
+    expect(row('plain.com').querySelector('.row__extra')).toBeNull();
+    const tags = Array.from(row('tagged.com').querySelectorAll<HTMLElement>('.row__extra .tag'));
+    expect(tags.map((x) => x.textContent)).toEqual(['one', 'two', '+2']);
+    expect(tags[2].title).toBe('one, two, three, four');
+  });
+
+  it('zone mark: a country flag for a country zone, a globe for a generic one (Ф8)', async () => {
+    await env.store.add(capture(['28.gd', 'a.com', 'x.io']));
+    await open();
+    const zone = (d: string) => root.querySelector(`.row[data-domain="${d}"] .row__zone-mark`) as HTMLElement;
+    expect(zone('28.gd').querySelector('img')?.getAttribute('src')).toBe('/flags/gd.svg');
+    expect(zone('28.gd').title).toMatch(/^\.gd/);
+    expect(zone('28.gd').title).not.toContain('zoneGeneric');
+    expect(zone('28.gd').getAttribute('aria-label')).toBe(zone('28.gd').title);
+    expect(zone('a.com').querySelector('img')).toBeNull();
+    expect(zone('a.com').querySelector('use')?.getAttribute('href')).toBe('#i-mono-web');
+    expect(zone('a.com').title).toBe('.com · zoneGeneric');
+    expect(zone('x.io').querySelector('use')?.getAttribute('href')).toBe('#i-mono-web');
+    expect(zone('x.io').title).toMatch(/zoneGeneric$/);
   });
 
   it('row editor: Escape closes without saving and returns focus to the row', async () => {
@@ -295,13 +362,102 @@ describe('side panel smoke', () => {
     (root.querySelector('.header button[aria-label="dataTitle"]') as HTMLButtonElement).click();
     expect(drawer('data').hidden).toBe(false);
     byText(drawer('data'), 'button', 'clearAll').click();
-    expect(root.querySelector('.confirm')?.textContent).toContain('clearQuestion|2');
+    expect(root.querySelector('.confirm:not([hidden])')?.textContent).toContain('clearQuestion|2');
     expect([...env.data.keys()].filter((k) => k.startsWith('d:'))).toHaveLength(2);
     byText(root, '.confirm button', 'clearConfirm|2').click();
     await settle();
     expect([...env.data.keys()].filter((k) => k.startsWith('d:'))).toHaveLength(0);
     expect((env.data.get('meta') as Meta).domainCount).toBe(0);
     expect(root.querySelector('.empty')).not.toBeNull();
+  });
+
+  it('bulk delete asks first, deletes the selected domains and clears the selection (Ф15а)', async () => {
+    await env.store.add(capture(['a.com', 'b.com', 'c.com']));
+    await open();
+    for (const d of ['a.com', 'c.com'])
+      (root.querySelector(`.row[data-domain="${d}"] input`) as HTMLInputElement).click();
+    byText(root, 'button', 'bulkEdit').click();
+    byText(drawer('bulk'), 'button', 'bulkDelete|2').click();
+    const box = drawer('bulk').querySelector('.confirm:not([hidden])') as HTMLElement;
+    expect(box.textContent).toContain('deleteQuestion|2');
+    expect(box.textContent).toContain('deleteWarning');
+    expect(rows()).toHaveLength(3); // nothing deleted before the second click
+    byText(box, 'button', 'clearConfirm|2').click();
+    await settle();
+    expect(rows()).toEqual(['b.com']);
+    expect(drawer('bulk').hidden).toBe(true);
+    expect(root.querySelector('.results__head--bulk')).toBeNull();
+  });
+
+  it('the domain card deletes its domain and closes (Ф15а)', async () => {
+    await env.store.add(capture(['a.com', 'b.com']));
+    await open();
+    (root.querySelector('.row[data-domain="a.com"] .row__main') as HTMLElement).click();
+    byText(drawer('editor'), 'button', 'editorDelete').click();
+    const box = drawer('editor').querySelector('.confirm:not([hidden])') as HTMLElement;
+    expect(box.textContent).toContain('deleteOneQuestion|a.com');
+    byText(box, 'button', 'clearConfirm|1').click();
+    await settle();
+    expect(rows()).toEqual(['b.com']);
+    expect(drawer('editor').hidden).toBe(true);
+  });
+
+  it('the data drawer clears one list; a domain from another list stays (Ф15а)', async () => {
+    await env.store.add(capture(['only.com', 'both.com']));
+    await env.store.add({
+      ...capture(['both.com', 'other.com']),
+      sourceId: 'member.expireddomains.net/domains/watchlist/',
+      sourceLabel: 'Watchlist Domains',
+    });
+    await open();
+    (root.querySelector('.header button[aria-label="dataTitle"]') as HTMLButtonElement).click();
+    const lists = Array.from(drawer('data').querySelectorAll('.data-list'), (x) => x.textContent);
+    expect(lists).toEqual(['Deleted .com Domains2listClear', 'Watchlist Domains2listClear']);
+    const row = Array.from(drawer('data').querySelectorAll<HTMLElement>('.data-list'))[0];
+    byText(row, 'button', 'listClear').click();
+    const box = drawer('data').querySelector('.confirm:not([hidden])') as HTMLElement;
+    expect(box.textContent).toContain('listClearQuestion|Deleted .com Domains|1');
+    expect(box.textContent).toContain('listClearKept|1');
+    byText(box, 'button', 'listClearConfirm').click();
+    await settle();
+    expect(rows().sort()).toEqual(['both.com', 'other.com']);
+    expect(Array.from(drawer('data').querySelectorAll('.data-list'), (x) => x.textContent)).toEqual([
+      'Watchlist Domains2listClear',
+    ]);
+  });
+
+  it('"Clear all" asks again when the collection grew while the question was open (Ф15)', async () => {
+    await env.store.add(capture(['a.com']));
+    await open();
+    (root.querySelector('.header button[aria-label="dataTitle"]') as HTMLButtonElement).click();
+    byText(drawer('data'), 'button', 'clearAll').click();
+    const box = root.querySelector('.confirm:not([hidden])') as HTMLElement;
+    expect(box.textContent).toContain('clearQuestion|1');
+    await env.store.add(capture(['b.com'])); // auto-capture in another tab
+    await settle();
+    byText(box, 'button', 'clearConfirm|1').click();
+    await settle();
+    expect(rows().sort()).toEqual(['a.com', 'b.com']);
+    expect(box.hidden).toBe(false);
+    expect(box.textContent).toContain('clearQuestion|2');
+  });
+
+  it('a list that grew while the question was open is asked about again, not cleared (Ф15а)', async () => {
+    await env.store.add(capture(['only.com']));
+    await open();
+    (root.querySelector('.header button[aria-label="dataTitle"]') as HTMLButtonElement).click();
+    const clear = drawer('data').querySelector('.data-list button') as HTMLButtonElement;
+    expect(clear.getAttribute('aria-label')).toBe('listClearLabel|Deleted .com Domains');
+    clear.click();
+    const box = drawer('data').querySelector('.confirm:not([hidden])') as HTMLElement;
+    expect(box.textContent).toContain('listClearQuestion|Deleted .com Domains|1');
+    await env.store.add(capture(['new1.com', 'new2.com'])); // auto-capture in another tab
+    await settle();
+    byText(box, 'button', 'listClearConfirm').click();
+    await settle();
+    expect(rows().sort()).toEqual(['new1.com', 'new2.com', 'only.com']);
+    expect(box.hidden).toBe(false);
+    expect(box.textContent).toContain('listClearQuestion|Deleted .com Domains|3');
   });
 
   it('restore is in the data drawer, also from the empty state (Ф27)', async () => {

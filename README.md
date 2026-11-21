@@ -30,7 +30,8 @@ the side panel.
 - Sign in to expireddomains.net, then open a domain list. A small panel appears on the right:
   "On page: 25 · page 1 of 58,270".
 - Press **Save page**, or turn on **Auto-capture**: every list page you open is then saved
-  after it loads. The extension never opens the next page for you.
+  after it loads. The extension never opens the next page for you. While auto-capture is on,
+  the collapsed panel's button is filled and shimmers when a page adds new domains.
 - The toolbar badge shows how many domains are collected.
 - Click the toolbar icon to open the side panel (in every browser; there is no popup) and
   review the collection while you keep browsing. It updates by itself.
@@ -42,10 +43,14 @@ the side panel.
   thresholds, archive age, name length, zones, no digits, no hyphens.
 - **Presets:** "All except rejected" (default), "Working — drops", "Working — auctions", plus
   up to 20 of your own.
+- **Compact list:** one line per domain, the zone dimmed, the list kind and a country flag (a globe
+  for generic zones) on the right; status, tags and note on a second line only when set.
 - **Statuses, tags and notes** per domain; bulk actions for the whole filter result.
+- **Delete** selected domains or one domain, **clear one list** (domains also captured from other
+  lists stay) or clear everything; each asks first.
 - **Export** of the current filter result: CSV (RFC 4180, UTF-8 with BOM), TXT, clipboard.
 - **Backup / restore** of everything as JSON (merge or replace).
-- **English and Russian** interface; light, dark and system theme.
+- **English and Russian** interface; light and dark theme (follows the system until you switch).
 
 ### CSV and Excel
 
@@ -98,9 +103,12 @@ APIs, site control or extra permissions appear.
 
 Tags are created only by the **Cut release** workflow after the full quality gate on Linux;
 **Release** attaches the three store packages, the source archive and `SHA256SUMS.txt` to the
-GitHub Release, and **Submit to stores** uploads them (v0.1.0 is submitted by hand).
+GitHub Release, and **Submit to stores** uploads them (the first store submission is made by hand).
 Firefox reviewers build from source as described in [AMO_BUILD.md](AMO_BUILD.md).
 
 ## License
 
 [Apache-2.0](LICENSE) · by [301.st](https://301.st)
+
+Country flags in `src/public/flags/` are from [flag-icons](https://github.com/lipis/flag-icons)
+(MIT, licence in `src/public/flags/LICENSE.txt`), optimised by `scripts/build-flags.mjs`.
