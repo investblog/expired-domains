@@ -56,3 +56,6 @@ opencode.json
 .output/
 *.zip
 temp/
+
+# promo video: render, subtitles and Recraft art stay on the maintainer's machine
+store-assets/video/

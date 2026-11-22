@@ -1,0 +1,14 @@
+{
+  "voice": "en_US-ljspeech-high",
+  "note": "Piper voice (public domain, LJ Speech). `say` is the spoken form; `text` is the caption shown in the .srt.",
+  "lines": [
+    { "id": "intro", "text": "Expired Domains. Every expired-domain list you browse, in one place.", "say": "Expired Domains. Every expired domain list you browse, in one place." },
+    { "id": "idea", "text": "Browse ExpiredDomains.net as usual. The extension never opens pages or sends requests on its own.", "say": "Browse Expired Domains dot net as usual. The extension never opens pages or sends requests on its own." },
+    { "id": "save", "text": "Open a list page and press Save page.", "say": "Open a list page, and press Save page." },
+    { "id": "auto", "text": "Turn on auto-capture, and every list page you open is saved.", "say": "Turn on auto capture, and every list page you open is saved." },
+    { "id": "live", "text": "The side panel updates live while you browse.", "say": "The side panel updates live while you browse." },
+    { "id": "filter", "text": "Filter the whole collection: zones, backlinks, archive age, drop dates and more.", "say": "Filter the whole collection: zones, backlinks, archive age, drop dates, and more." },
+    { "id": "mark", "text": "Shortlist, tag and note the domains you like, then export them to CSV, TXT or the clipboard.", "say": "Shortlist, tag, and note the domains you like. Then export them to C S V, T X T, or the clipboard." },
+    { "id": "outro", "text": "Expired Domains. Free, open source, and your data stays in your browser.", "say": "Expired Domains. Free, open source, and your data stays in your browser." }
+  ]
+}

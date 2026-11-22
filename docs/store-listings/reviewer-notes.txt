@@ -13,6 +13,14 @@ Any e-mail address you can read works. If you prefer a disposable one, MailBot (
 - Telegram, no install: https://t.me/gotemailbot
 An address lives 24 hours, enough for one review session.
 
+TEST STEPS — SHORT (Chrome Web Store "Test instructions", limit 500 characters)
+
+No shared account: the site e-mails a login code for every new device. Please register a free one at https://www.expireddomains.net/register/ (any e-mail; MailBot gives a temporary one).
+1. Open Deleted Domains > .com.
+2. Press "Save page" in the panel at the top right: +25 new, badge 25.
+3. Open page 2 yourself and save it, or turn on Auto-capture.
+4. Click the toolbar icon: the side panel shows the whole list. Filter, set a status, export CSV or TXT.
+
 TEST STEPS
 
 1. Install the extension. A welcome tab opens once: it explains the site, the free account and the steps below.
