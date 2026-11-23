@@ -8,6 +8,7 @@ import type { Response } from '@/shared/messages';
 import { type ParseResult, parseListing } from '@/shared/parse';
 import type { Capture } from '@/shared/records';
 import type { Source } from '@/shared/source';
+import type { PageMode, TabSaveResult } from '@/shared/tab-messages';
 import type { Settings } from '@/shared/types';
 import { PANEL_CSS } from './panel-css';
 
@@ -35,6 +36,12 @@ export interface PanelHandle {
   root: ShadowRoot;
   /** Resolves when the automatic capture (if any) has finished. */
   autoDone: Promise<void>;
+  /** The table as it is now: mode and row count (Ф13в, asked by the side panel). */
+  state: () => { mode: PageMode; rows: number };
+  /** The "Save page" button's own path, for the side panel's button (Ф13в). */
+  save: () => Promise<TabSaveResult>;
+  /** Follow an auto-capture change made in the side panel. */
+  setAutoCapture: (on: boolean) => void;
 }
 
 /** Host element styles, applied inline with `!important` (`all` first, longhands after it). */
@@ -63,9 +70,7 @@ export const HOST_STYLE: [string, string][] = [
   ['color', 'var(--text)'],
 ];
 
-type Mode = 'ready' | 'empty' | 'broken';
-
-function modeOf(result: ParseResult): Mode {
+function modeOf(result: ParseResult): PageMode {
   switch (result.diagnostics.code) {
     case 'ok':
       return 'ready';
@@ -186,16 +191,16 @@ export function mountPanel(deps: PanelDeps): PanelHandle | null {
   };
 
   let busy = false;
-  async function capture(): Promise<void> {
-    if (busy) return;
+  async function capture(): Promise<TabSaveResult> {
+    if (busy) return { ok: false, error: 'busy' };
     if (deps.contextInvalidated()) {
       setStatus(RELOAD, 'error');
-      return;
+      return { ok: false, error: 'reload' };
     }
     // С2: the table is re-read at the moment of saving.
     const result = parseListing(doc);
     render(result);
-    if (modeOf(result) !== 'ready') return;
+    if (modeOf(result) !== 'ready') return { ok: false, error: modeOf(result) };
     busy = true;
     save.disabled = true;
     setStatus(t('panelSaving'));
@@ -213,6 +218,7 @@ export function mountPanel(deps: PanelDeps): PanelHandle | null {
       } else {
         setStatus(failText(), 'error');
       }
+      return res;
     } finally {
       busy = false;
       save.disabled = false;
@@ -246,6 +252,15 @@ export function mountPanel(deps: PanelDeps): PanelHandle | null {
   applyCollapsed();
   doc.body.append(host);
 
-  const autoDone = deps.settings.autoCapture && modeOf(initial) === 'ready' ? capture() : Promise.resolve();
-  return { host, root, autoDone };
+  const autoDone =
+    deps.settings.autoCapture && modeOf(initial) === 'ready' ? capture().then(() => undefined) : Promise.resolve();
+  const state = () => {
+    const now = parseListing(doc);
+    return { mode: modeOf(now), rows: now.rows.length };
+  };
+  const setAutoCapture = (on: boolean) => {
+    autoBox.checked = on;
+    showAutoMode(on);
+  };
+  return { host, root, autoDone, state, save: capture, setAutoCapture };
 }

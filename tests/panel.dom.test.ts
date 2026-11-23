@@ -126,6 +126,31 @@ describe('panel on real pages (Ф1, Ф2, С1)', () => {
   });
 });
 
+describe('panel handle for the side panel (Ф13в)', () => {
+  it('state() reports the table; save() takes the button path and returns the result', async () => {
+    const { handle, q, area } = setup(load('deleted-com-p1'));
+    expect(handle?.state()).toEqual({ mode: 'ready', rows: 25 });
+    const res = await handle?.save();
+    expect(res).toEqual({ ok: true, result: expect.objectContaining({ added: 25, total: 25 }) });
+    expect(q('.status').textContent).toBe('panelSaved|25|0|25');
+    expect((area.data.get('meta') as Meta).domainCount).toBe(25);
+  });
+
+  it('save() on a page without rows saves nothing and says why', async () => {
+    const { handle, adds } = setup(load('search-empty'));
+    expect(handle?.state().mode).toBe('empty');
+    expect(await handle?.save()).toEqual({ ok: false, error: 'empty' });
+    expect(adds).toHaveLength(0);
+  });
+
+  it('setAutoCapture() follows a change made in the side panel', () => {
+    const { handle, q } = setup(load('deleted-com-p1'));
+    handle?.setAutoCapture(true);
+    expect(q<HTMLInputElement>('.auto input').checked).toBe(true);
+    expect(q('.collapsed').classList.contains('collapsed--auto')).toBe(true);
+  });
+});
+
 describe('panel by parse code (Е2, A4 panel side)', () => {
   const cases: [string, (d: Document) => void, string | null][] = [
     ['no table', (d) => d.querySelector('table.base1')?.remove(), 'panelLayoutUnknown'],

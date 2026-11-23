@@ -22,6 +22,7 @@ import { createDrawer } from './drawer';
 import { createFilterForm, statusLabel } from './filter-form';
 import { type ListKind, listKind } from './list-kind';
 import { type Data, domainsWithTag, listBreakdown, parseTagList, readData, stateOf, tagCounts } from './model';
+import { createStart } from './start';
 import { initTheme, type Theme, toggleTheme, watchSystemTheme } from './theme';
 import { zoneCountry, zoneOf } from './zone';
 
@@ -326,28 +327,20 @@ export async function startApp(root: HTMLElement): Promise<void> {
   const list = h('ul', { class: 'list' });
   const more = h('div', { class: 'muted more' });
   const listScroll = h('div', { class: 'list-scroll' }, list, more);
-  // Ф13: the empty state is the first thing a new user sees — say what the site is, that an
-  // account helps, and the three steps; the welcome page has the long version.
-  const outLink = (text: string, href: string, cls = '') =>
-    h('a', { class: cls, text, attrs: { href, target: '_blank', rel: 'noopener' } });
+  // Ф13: the empty state is the first thing a new user sees — say what the site is and show the
+  // three steps live, from what is open in the active tab (Ф13в); the welcome page has the long
+  // version.
+  const start = createStart({
+    autoCapture: () => data.settings.autoCapture,
+    setAutoCapture: (on) => saveSettings({ autoCapture: on }),
+    toast: (text, kind) => toast(text, kind),
+  });
   const empty = h(
     'section',
     { class: 'empty' },
     h('h2', { class: 'empty__title', text: t('emptyTitle') }),
     h('p', { class: 'muted', text: t('emptyText') }),
-    h(
-      'ol',
-      { class: 'empty__steps' },
-      h('li', { text: t('emptyStepAccount') }),
-      h('li', { text: t('emptyStepList') }),
-      h('li', { text: t('emptyStepSave') }),
-    ),
-    h(
-      'div',
-      { class: 'actions__row' },
-      outLink(t('linkRegister'), 'https://www.expireddomains.net/register/', 'btn btn--primary'),
-      outLink(t('linkSiteOpen'), 'https://www.expireddomains.net/', 'btn'),
-    ),
+    start.element,
     // Secondary actions: 301-ui `.link--muted.link--icon`, one per line under a divider.
     h(
       'div',
@@ -955,6 +948,7 @@ export async function startApp(root: HTMLElement): Promise<void> {
     const hasData = data.records.size > 0;
     clearGroup.hidden = !hasData;
     body.replaceChildren(...(hasData ? [toolbar, resultsHead, listScroll, exportBar] : [empty]));
+    if (!hasData) void start.refresh();
     renderRestore();
     recompute();
   }
@@ -976,6 +970,7 @@ export async function startApp(root: HTMLElement): Promise<void> {
     clearGroup.hidden = !hasData;
     if (hasData !== body.contains(toolbar)) renderAll();
     else recompute();
+    if (!hasData && prev.autoCapture !== data.settings.autoCapture) start.rerender();
   }
 
   // Subscribe before the first read, so a change committed in between is not lost (Ф16); a

@@ -94,6 +94,8 @@ const PAGE_LINKS = [
   /^https:\/\/addons\.mozilla\.org\/firefox\/addon\//,
   // onboarding (Ф13, Ф13б): the site's home page and its free sign-up page
   /^https:\/\/www\.expireddomains\.net\/(register\/)?$/,
+  // the first list to open from the live start steps (Ф13в)
+  /^https:\/\/member\.expireddomains\.net\/domains\/expiredcom\/$/,
 ];
 const URL_ALLOW = {
   any: [/^http:\/\/www\.w3\.org\/2000\/svg$/], // SVG namespace, not a request

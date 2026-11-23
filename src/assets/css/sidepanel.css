@@ -200,7 +200,21 @@ input[type="checkbox"] { accent-color: var(--primary); }
 .empty { flex: 1; min-height: 0; padding: var(--space-4); overflow-y: auto; }
 .empty__title { margin: 0 0 var(--space-2); font-size: var(--fs-lg); font-weight: var(--fw-semibold); }
 .empty p { margin: 0 0 var(--space-3); }
-.empty__steps { margin: 0 0 var(--space-4); padding-left: 1.3em; display: flex; flex-direction: column; gap: var(--space-2); }
+/* Live start steps (Ф13в): done ones get a check, the current one is open with its actions. */
+.start { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-3); }
+.start__step { display: flex; gap: var(--space-2); align-items: flex-start; }
+.start__mark {
+  flex: 0 0 22px; height: 22px; border-radius: 50%; display: inline-grid; place-items: center;
+  font-size: var(--fs-xs); font-weight: var(--fw-semibold); border: 1px solid var(--border-strong); color: var(--muted);
+}
+.start__mark .icon { width: 14px; height: 14px; }
+.start__step--now .start__mark { background: var(--primary); border-color: var(--primary); color: #fff; }
+.start__step--done .start__mark { background: var(--primary-soft); border-color: transparent; color: var(--primary); }
+.start__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-2); }
+.start__title { line-height: 22px; font-weight: var(--fw-semibold); }
+.start__step--done .start__title, .start__step--next .start__title { font-weight: normal; color: var(--muted); }
+.start__body p { margin: 0; }
+.start__hint { font-size: var(--fs-xs); }
 .empty__more {
   display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2);
   margin-top: var(--space-4); padding-top: var(--space-3); border-top: 1px solid var(--border-subtle);

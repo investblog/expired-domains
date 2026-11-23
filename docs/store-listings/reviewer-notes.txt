@@ -34,7 +34,7 @@ TEST STEPS
 
 PERMISSIONS
 
-Content script on *://expireddomains.net/* and *://*.expireddomains.net/*: reads the domain table (#listing) of the page the user opened, its address and title, and shows the save panel. Nothing outside the listing is read.
+Content script on *://expireddomains.net/* and *://*.expireddomains.net/*: reads the domain table (#listing) of the page the user opened, its address and title, and shows the save panel. Nothing outside the listing is read. While the collection is empty, the side panel asks the content script of the active tab (tabs.sendMessage, no "tabs" permission) whether the page has a domain list, to show the next step and a "Save this page" button.
 
 storage: keeps the collected domains, their columns, statuses, tags, notes and settings locally.
 

@@ -39,6 +39,7 @@ function setupBrowser() {
   const store = createStore(area, () => Date.now());
   const sent: { type: string; [k: string]: unknown }[] = [];
   Object.assign(fake.browser, {
+    tabs: undefined, // per test: see fakeTabs()
     runtime: {
       id: 'test-id',
       getURL: (p: string) => `chrome-extension://test-id${p}`,
@@ -76,6 +77,12 @@ const byText = (root: ParentNode, sel: string, text: string) =>
   Array.from(root.querySelectorAll<HTMLElement>(sel)).find((e) => e.textContent === text) as HTMLElement;
 const drawer = (id: string) => root.querySelector(`[data-drawer="${id}"]`) as HTMLElement;
 const rows = () => Array.from(root.querySelectorAll('.row__domain')).map((e) => e.textContent);
+/** Live start steps as [state, title]. */
+const startSteps = () =>
+  Array.from(root.querySelectorAll('.start__step')).map((li) => [
+    li.className.replace(/.*start__step--(\w+).*/, '$1'),
+    li.querySelector('.start__title')?.textContent,
+  ]);
 const pressEscape = (el: HTMLElement) =>
   (el.querySelector('.drawer__panel') as HTMLElement).dispatchEvent(
     new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
@@ -109,16 +116,117 @@ describe('side panel smoke', () => {
     await open();
     const empty = root.querySelector('.empty') as HTMLElement;
     expect(empty.querySelector('.empty__title')?.textContent).toBe('emptyTitle');
-    expect(Array.from(empty.querySelectorAll('.empty__steps li')).map((li) => li.textContent)).toEqual([
-      'emptyStepAccount',
-      'emptyStepList',
-      'emptyStepSave',
+    // No tabs API (store harness, video stub): step 1 is current, as when the site is not open.
+    expect(startSteps()).toEqual([
+      ['now', 'startOpenSite'],
+      ['next', 'startOpenList'],
+      ['next', 'startSave'],
     ]);
     const href = (text: string) => byText(empty, 'a', text).getAttribute('href');
     expect(href('linkRegister')).toBe('https://www.expireddomains.net/register/');
     expect(href('linkSiteOpen')).toBe('https://www.expireddomains.net/');
     expect(href('welcomeLink')).toBe('chrome-extension://test-id/welcome.html');
+    expect(empty.textContent).toContain('startReloadHint');
     for (const a of empty.querySelectorAll('a')) expect(a.getAttribute('target')).toBe('_blank');
+  });
+
+  describe('live start steps from the active tab (Ф13в)', () => {
+    /** A fake tabs API: the active tab answers like our content script, or not at all. */
+    function fakeTabs(answer: (msg: { type: string }) => unknown) {
+      const calls: { tabId: number; msg: { type: string } }[] = [];
+      const activated: (() => void)[] = [];
+      const runtimeListeners: ((msg: unknown) => unknown)[] = [];
+      Object.assign(fake.browser, {
+        tabs: {
+          query: async () => [{ id: 7 }],
+          sendMessage: async (tabId: number, msg: { type: string }) => {
+            calls.push({ tabId, msg });
+            const res = answer(msg);
+            if (res instanceof Error) throw res;
+            return res;
+          },
+          onActivated: { addListener: (fn: () => void) => activated.push(fn) },
+          onUpdated: { addListener: () => undefined },
+        },
+      });
+      (fake.browser.runtime as Record<string, unknown>).onMessage = {
+        addListener: (fn: (msg: unknown) => unknown) => runtimeListeners.push(fn),
+      };
+      return { calls, activated, runtimeListeners };
+    }
+    const noScript = () => new Error('Could not establish connection. Receiving end does not exist.');
+
+    it('no answer from the tab: open the site, with the reload hint', async () => {
+      fakeTabs(noScript);
+      await open();
+      expect(startSteps()[0]).toEqual(['now', 'startOpenSite']);
+      expect(root.querySelector('.start')?.textContent).toContain('startReloadHint');
+    });
+
+    it('on the site without a list: step 2 with the first list to open', async () => {
+      fakeTabs(() => ({ listing: false }));
+      await open();
+      expect(startSteps()).toEqual([
+        ['done', 'startSiteOpen'],
+        ['now', 'startOpenList'],
+        ['next', 'startSave'],
+      ]);
+      expect(byText(root, 'a', 'startFirstList').getAttribute('href')).toBe(
+        'https://member.expireddomains.net/domains/expiredcom/',
+      );
+    });
+
+    it('on a list: "Save this page" asks the tab to save; the list then replaces the steps', async () => {
+      const tabs = fakeTabs((msg) => {
+        if (msg.type === 'edsTab:state') return { listing: true, mode: 'ready', rows: 2 };
+        // The content script saves through the background, as its own button does.
+        return env.store.add(capture(['alpha.com', 'beta.com'])).then((result) => ({ ok: true, result }));
+      });
+      await open();
+      expect(startSteps().map((s) => s[0])).toEqual(['done', 'done', 'now']);
+      expect(root.querySelector('.start')?.textContent).toContain('panelOnPage|2');
+      const save = byText(root, 'button', 'startSaveHere') as HTMLButtonElement;
+      expect(save.disabled).toBe(false);
+      save.click();
+      await settle();
+      expect(tabs.calls.at(-1)).toEqual({ tabId: 7, msg: { type: 'edsTab:save' } });
+      expect(root.querySelector('.toast')?.textContent).toBe('panelSaved|2|0|2');
+      expect(rows()).toEqual(['alpha.com', 'beta.com']);
+    });
+
+    it('a list page without rows: saving is off and the sign-in reason is shown', async () => {
+      fakeTabs(() => ({ listing: true, mode: 'empty', rows: 0 }));
+      await open();
+      expect((byText(root, 'button', 'startSaveHere') as HTMLButtonElement).disabled).toBe(true);
+      expect(root.querySelector('.start')?.textContent).toContain('startPageEmpty');
+    });
+
+    it('auto-capture in step 3 is the same setting as on the page', async () => {
+      fakeTabs(() => ({ listing: true, mode: 'ready', rows: 2 }));
+      await open();
+      const box = root.querySelector('.start__auto input') as HTMLInputElement;
+      box.checked = true;
+      box.dispatchEvent(new Event('change'));
+      await settle();
+      expect(env.sent).toContainEqual({ type: 'eds:setSettings', settings: { autoCapture: true } });
+    });
+
+    it('switching tabs or a page announcing itself asks again', async () => {
+      let page: unknown = noScript();
+      const tabs = fakeTabs(() => page);
+      await open();
+      expect(startSteps()[0][0]).toBe('now');
+      page = { listing: false };
+      for (const fn of tabs.activated) fn();
+      await settle();
+      expect(startSteps()[1]).toEqual(['now', 'startOpenList']);
+      page = { listing: true, mode: 'ready', rows: 5 };
+      for (const fn of tabs.runtimeListeners) expect(fn({ type: 'edsTab:ready' })).toBeUndefined();
+      await settle();
+      expect(startSteps()[2][0]).toBe('now');
+      // Writer requests are not answered here (the background answers them).
+      for (const fn of tabs.runtimeListeners) expect(fn({ type: 'eds:ensureReady' })).toBeUndefined();
+    });
   });
 
   it('the footer is a row of labelled icon links from the sprite (Ф16а)', async () => {

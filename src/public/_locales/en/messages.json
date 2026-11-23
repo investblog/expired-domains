@@ -607,13 +607,43 @@
     "message": "Expired Domains collects domain lists from ExpiredDomains.net — a free service with deleted, expiring and auction domains. Only pages you open yourself are saved."
   },
   "emptyStepAccount": {
-    "message": "Sign in to ExpiredDomains.net — most lists are shown only after sign-in; a free account is enough."
+    "message": "Most lists are shown only after sign-in; a free account is enough."
   },
-  "emptyStepList": {
-    "message": "Open any domain list there."
+  "startOpenSite": {
+    "message": "Open ExpiredDomains.net and sign in"
   },
-  "emptyStepSave": {
-    "message": "Press “Save page” in the small panel at the top right, or turn on auto-capture."
+  "startSiteOpen": {
+    "message": "ExpiredDomains.net is open"
+  },
+  "startReloadHint": {
+    "message": "Already open? Reload that tab once: the extension starts on pages loaded after it was installed."
+  },
+  "startOpenList": {
+    "message": "Open a domain list"
+  },
+  "startListOpen": {
+    "message": "A domain list is open"
+  },
+  "startFirstList": {
+    "message": "Deleted .com domains"
+  },
+  "startListHint": {
+    "message": "Or any other list from the site menu: deleted, expiring, pending delete, auctions."
+  },
+  "startSave": {
+    "message": "Save the page"
+  },
+  "startSaveHere": {
+    "message": "Save this page"
+  },
+  "startSaveHint": {
+    "message": "The same button is in the small panel at the top right of the page. With auto-capture on, every list page you open is saved by itself."
+  },
+  "startPageEmpty": {
+    "message": "No domains on this page. Most lists show domains only after you sign in."
+  },
+  "startSaveFailed": {
+    "message": "Not saved. Reload the page and try again."
   },
   "welcomeLink": {
     "message": "How it works"

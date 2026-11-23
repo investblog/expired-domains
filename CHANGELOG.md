@@ -2,6 +2,12 @@
 
 All notable changes to Expired Domains are documented here.
 
+## [Unreleased]
+
+### Added
+
+- **Live start steps** — while the list is empty, the side panel follows the active tab: open ExpiredDomains.net and sign in → open a domain list (a button opens Deleted .com) → save the page, with a "Save this page" button and the auto-capture switch right in the side panel. A site tab opened before installation gets a hint to reload it. No new permissions
+
 ## [0.1.1] - 2026-11-21
 
 ### Added

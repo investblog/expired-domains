@@ -6,6 +6,6 @@ Account: expireddomains.net shows its lists only to signed-in users and e-mails 
 
 How to test: see reviewer-notes.txt (same steps). A welcome tab opens once after installation. The toolbar icon opens the side panel; there is no popup.
 
-Permissions: content script on expireddomains.net (reads the domain table of the open page), storage, unlimitedStorage (up to 10,000 domains with ~30 columns), sidePanel (list beside the site).
+Permissions: content script on expireddomains.net (reads the domain table of the open page; while the collection is empty it tells the side panel whether the active tab has a domain list, via tabs.sendMessage without the "tabs" permission), storage, unlimitedStorage (up to 10,000 domains with ~30 columns), sidePanel (list beside the site).
 
 Network: none. No analytics, telemetry or remote code. Data stays in local browser storage.
