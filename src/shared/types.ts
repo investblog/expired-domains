@@ -53,6 +53,10 @@ export interface Settings {
   panelCollapsed: boolean;
   filterPresets: FilterPreset[];
   activePreset: string;
+  /** Badges, the status menu and "new" in the site's table (Ф28, Ф30, Ф31). Absent means true (0.1 data). */
+  pageMarks?: boolean;
+  /** Dim rejected rows in the site's table (Ф29). Absent means true (0.1 data). */
+  dimRejected?: boolean;
 }
 
 /** `meta` storage key (section 6). `pending` is present only between steps 1 and 3 (Ф11). */

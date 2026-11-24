@@ -576,6 +576,21 @@ describe('side panel smoke', () => {
     expect(drawer('data').querySelector('label[for="eds-restore-file"]')).not.toBeNull();
   });
 
+  it('page-mark switches in the data drawer store their settings and follow storage (SPEC 4.7, Ф32)', async () => {
+    await open();
+    const box = (label: string) =>
+      byText(drawer('data'), 'label.check', label).querySelector('input') as HTMLInputElement;
+    // Defaults: both on.
+    expect([box('panelPageMarks').checked, box('panelDimRejected').checked]).toEqual([true, true]);
+    box('panelDimRejected').click();
+    await settle();
+    expect(env.sent).toContainEqual({ type: 'eds:setSettings', settings: { dimRejected: false } });
+    expect(box('panelDimRejected').checked).toBe(false);
+    await env.store.setSettings({ pageMarks: false });
+    await settle();
+    expect(box('panelPageMarks').checked).toBe(false);
+  });
+
   it('no popup mode: no "pin to the side" button (Ф13а)', async () => {
     (fake.browser as Record<string, unknown>).sidebarAction = { open: async () => undefined };
     await env.store.add(capture(['a.com']));

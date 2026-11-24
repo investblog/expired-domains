@@ -735,5 +735,52 @@
         "content": "$2"
       }
     }
+  },
+  "panelPageMarks": {
+    "message": "Marks in the table"
+  },
+  "panelDimRejected": {
+    "message": "Dim rejected"
+  },
+  "markInCollection": {
+    "message": "In the collection"
+  },
+  "markNotSaved": {
+    "message": "not in the collection; click to set a status"
+  },
+  "markHasNote": {
+    "message": "has a note"
+  },
+  "markNew": {
+    "message": "new"
+  },
+  "markNewTitle": {
+    "message": "Was not in the collection when this page was opened"
+  },
+  "markShortlist": {
+    "message": "Shortlist"
+  },
+  "markReject": {
+    "message": "Reject"
+  },
+  "markClear": {
+    "message": "Clear status"
+  },
+  "markMenu": {
+    "message": "Status"
+  },
+  "markTags": {
+    "message": "tags: $tags$",
+    "placeholders": {
+      "tags": {
+        "content": "$1"
+      }
+    }
+  },
+  "dataPageLegend": {
+    "message": "On the site’s pages"
+  },
+  "dataPageMarksHint": {
+    "message": "Statuses next to the domains, a bar on shortlisted rows and “new” for domains that were not in the collection."
   }
 }

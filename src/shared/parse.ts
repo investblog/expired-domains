@@ -73,10 +73,13 @@ function firstLinkTitle(td: Element): string | null {
   return td.querySelector('a')?.getAttribute('title') ?? null;
 }
 
+/** The domain's own link in `td.field_domain`: the first one that is not a registrar favicon (Д4). */
+const domainLink = (cell: Element): Element | undefined =>
+  Array.from(cell.querySelectorAll('a')).find((a) => !a.classList.contains('favicons'));
+
 /** Д4/Д5: full name from the link `title`; fallback `/domain/<name>` (absent on public pages). */
 function rawDomainName(row: Element, cell: Element): string | null {
-  const link = Array.from(cell.querySelectorAll('a')).find((a) => !a.classList.contains('favicons'));
-  const title = link?.getAttribute('title');
+  const title = domainLink(cell)?.getAttribute('title');
   if (title?.trim()) return title;
   const href = row.querySelector('a[href^="/domain/"]')?.getAttribute('href');
   if (!href) return null;
@@ -108,11 +111,40 @@ function empty(code: ParseCode, pager: Pager | null = null): ParseResult {
   };
 }
 
+const listingTable = (doc: Document): Element | null => doc.querySelector('#listing table.base1');
+const dataRowsOf = (table: Element): Element[] =>
+  Array.from(table.querySelectorAll('tr')).filter((tr) => tr.querySelector('td.field_domain'));
+
+export interface DomainRow {
+  tr: Element;
+  /** The domain link; the page marks are placed after it (SPEC Ф28). */
+  link: Element;
+  domain: string;
+}
+
+/**
+ * Data rows with a valid domain, in page order, duplicates kept: the same rows and names
+ * `parseListing` reads (Д1а, Д4, Д5), with their elements, for the page marks (SPEC 4.7).
+ */
+export function domainRows(doc: Document): DomainRow[] {
+  const table = listingTable(doc);
+  if (!table) return [];
+  const out: DomainRow[] = [];
+  for (const tr of dataRowsOf(table)) {
+    const cell = tr.querySelector('td.field_domain') as Element;
+    const link = domainLink(cell);
+    const raw = rawDomainName(tr, cell);
+    const result = raw === null ? null : toDomain(raw);
+    if (link && result?.ok) out.push({ tr, link, domain: result.domain });
+  }
+  return out;
+}
+
 export function parseListing(doc: Document): ParseResult {
   const listing = doc.querySelector('#listing');
   if (!listing) return empty('no_listing');
   const pager = parsePager(listing);
-  const table = listing.querySelector('table.base1');
+  const table = listingTable(doc);
   if (!table) return empty('no_table', pager);
 
   // Columns by class key, in header order (Д2).
@@ -137,7 +169,7 @@ export function parseListing(doc: Document): ParseResult {
   if (!hasDomainHead) return { ...empty('no_domain_column', pager), columns };
 
   const bodyRows = Array.from(table.querySelectorAll('tr')).filter((tr) => tr.querySelector('td'));
-  const dataRows = bodyRows.filter((tr) => tr.querySelector('td.field_domain'));
+  const dataRows = dataRowsOf(table);
   if (dataRows.length === 0) {
     // A body row with data cells (`td.field_*`) but no domain cell is layout drift; a row
     // without any `field_*` cell ("no Domains found", Д1а) is the real empty result.

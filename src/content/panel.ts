@@ -6,10 +6,12 @@ import type { AddResult } from '@/background/store';
 import { inlineIcon } from '@/shared/icons';
 import type { Response } from '@/shared/messages';
 import { type ParseResult, parseListing } from '@/shared/parse';
+import { pageMarkSettings } from '@/shared/presets';
 import type { Capture } from '@/shared/records';
 import type { Source } from '@/shared/source';
 import type { PageMode, TabSaveResult } from '@/shared/tab-messages';
 import type { Settings } from '@/shared/types';
+import type { MarkSwitches } from './marks';
 import { PANEL_CSS } from './panel-css';
 
 export const PANEL_HOST_ID = 'expired-domains-panel-301st';
@@ -21,7 +23,7 @@ export const SHIMMER_MS = 1200;
 export interface PanelDeps {
   doc: Document;
   source: Source;
-  settings: Pick<Settings, 'autoCapture' | 'panelCollapsed'>;
+  settings: Pick<Settings, 'autoCapture' | 'panelCollapsed'> & Partial<MarkSwitches>;
   windowWidth: number;
   t: (key: string, ...subs: string[]) => string;
   add: (capture: Capture) => Promise<Response<AddResult>>;
@@ -42,6 +44,12 @@ export interface PanelHandle {
   save: () => Promise<TabSaveResult>;
   /** Follow an auto-capture change made in the side panel. */
   setAutoCapture: (on: boolean) => void;
+  /** Follow the page-mark switches changed in the side panel (Ф32). */
+  setMarkSwitches: (switches: MarkSwitches) => void;
+  /** Ф30: save one row of this page, re-read now, with the same columns as "Save page". */
+  saveRow: (domain: string) => Promise<boolean>;
+  /** Show that a page-mark action was not stored (Ф30). */
+  failed: () => void;
 }
 
 /** Host element styles, applied inline with `!important` (`all` first, longhands after it). */
@@ -144,9 +152,24 @@ export function mountPanel(deps: PanelDeps): PanelHandle | null {
   autoBox.type = 'checkbox';
   autoBox.checked = deps.settings.autoCapture;
   auto.append(autoBox, el('span', undefined, t('panelAutoCapture')));
+  // Ф32: the page-mark switches; the change reaches the marks through storage, like the side panel's.
+  const switchBox = (key: keyof MarkSwitches, label: string) => {
+    const row = el('label', 'auto');
+    const box = el('input');
+    box.type = 'checkbox';
+    box.checked = pageMarkSettings(deps.settings)[key];
+    row.append(box, el('span', undefined, label));
+    box.addEventListener('change', async () => {
+      const wanted = box.checked;
+      if (!(await storeSetting({ [key]: wanted }))) box.checked = !wanted;
+    });
+    return { row, box };
+  };
+  const marksSwitch = switchBox('pageMarks', t('panelPageMarks'));
+  const dimSwitch = switchBox('dimRejected', t('panelDimRejected'));
   const status = el('div', 'status');
   status.setAttribute('role', 'status');
-  panel.append(head, warning, info, save, auto, status);
+  panel.append(head, warning, info, save, auto, marksSwitch.row, dimSwitch.row, status);
   root.append(collapsedBtn, panel);
 
   // Read while the extension is alive: after it is reloaded or updated, this orphaned script's
@@ -262,5 +285,24 @@ export function mountPanel(deps: PanelDeps): PanelHandle | null {
     autoBox.checked = on;
     showAutoMode(on);
   };
-  return { host, root, autoDone, state, save: capture, setAutoCapture };
+  const setMarkSwitches = (s: MarkSwitches) => {
+    marksSwitch.box.checked = s.pageMarks;
+    dimSwitch.box.checked = s.dimRejected;
+  };
+  async function saveRow(domain: string): Promise<boolean> {
+    if (deps.contextInvalidated()) return false;
+    // С2: the row is read at the moment of saving, from a table the parser accepts.
+    const result = parseListing(doc);
+    const row = result.rows.find((r) => r.domain === domain);
+    if (modeOf(result) !== 'ready' || !row) return false;
+    const res = await deps.add({
+      sourceId: deps.source.sourceId,
+      sourceLabel: deps.source.sourceLabel,
+      columns: result.columns,
+      rows: [row],
+    });
+    return res.ok;
+  }
+  const failed = () => setStatus(failText(), 'error');
+  return { host, root, autoDone, state, save: capture, setAutoCapture, setMarkSwitches, saveRow, failed };
 }

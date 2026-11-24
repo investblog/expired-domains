@@ -735,5 +735,52 @@
         "content": "$2"
       }
     }
+  },
+  "panelPageMarks": {
+    "message": "Отметки в таблице"
+  },
+  "panelDimRejected": {
+    "message": "Приглушать отклонённые"
+  },
+  "markInCollection": {
+    "message": "В накоплении"
+  },
+  "markNotSaved": {
+    "message": "нет в накоплении; нажмите, чтобы поставить статус"
+  },
+  "markHasNote": {
+    "message": "есть заметка"
+  },
+  "markNew": {
+    "message": "новый"
+  },
+  "markNewTitle": {
+    "message": "Не было в накоплении, когда страница открылась"
+  },
+  "markShortlist": {
+    "message": "Отобрать"
+  },
+  "markReject": {
+    "message": "Отклонить"
+  },
+  "markClear": {
+    "message": "Снять статус"
+  },
+  "markMenu": {
+    "message": "Статус"
+  },
+  "markTags": {
+    "message": "теги: $tags$",
+    "placeholders": {
+      "tags": {
+        "content": "$1"
+      }
+    }
+  },
+  "dataPageLegend": {
+    "message": "На страницах сайта"
+  },
+  "dataPageMarksHint": {
+    "message": "Статусы рядом с доменами, полоса у отобранных и «новый» у доменов, которых не было в накоплении."
   }
 }

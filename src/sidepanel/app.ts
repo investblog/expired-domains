@@ -12,7 +12,14 @@ import { applyFilter, type Selection } from '@/shared/filter';
 import { t } from '@/shared/i18n';
 import { codePointLength } from '@/shared/limits';
 import { type Request, sendRequest } from '@/shared/messages';
-import { addPreset, deletePreset, isBuiltinPreset, presetFilter, renamePreset } from '@/shared/presets';
+import {
+  addPreset,
+  deletePreset,
+  isBuiltinPreset,
+  pageMarkSettings,
+  presetFilter,
+  renamePreset,
+} from '@/shared/presets';
 import { watchMeta } from '@/shared/refresh';
 import { type IconId, STORE_ICON } from '@/shared/sprite';
 import { tagKey } from '@/shared/tags';
@@ -882,7 +889,28 @@ export async function startApp(root: HTMLElement): Promise<void> {
     h('div', { class: 'actions__row' }, button(t('clearAll'), showClearConfirm, 'btn btn--danger-ghost')),
     clearBox,
   );
+  // SPEC 4.7, Ф32: the page-mark switches, same settings as the on-page panel's.
+  const markSwitch = (key: 'pageMarks' | 'dimRejected', label: string) => {
+    const box = h('input', { attrs: { type: 'checkbox' } });
+    box.addEventListener('change', async () => {
+      const wanted = box.checked;
+      if (!(await saveSettings({ [key]: wanted }))) box.checked = !wanted;
+    });
+    return { box, el: h('label', { class: 'check' }, box, t(label)) };
+  };
+  const pageMarksSwitch = markSwitch('pageMarks', 'panelPageMarks');
+  const dimRejectedSwitch = markSwitch('dimRejected', 'panelDimRejected');
+  const renderMarkSwitches = () => {
+    const s = pageMarkSettings(data.settings);
+    pageMarksSwitch.box.checked = s.pageMarks;
+    dimRejectedSwitch.box.checked = s.dimRejected;
+  };
   dataDrawer.body.append(
+    group(
+      'dataPageLegend',
+      h('div', { class: 'checks' }, pageMarksSwitch.el, dimRejectedSwitch.el),
+      h('p', { class: 'hint', text: t('dataPageMarksHint') }),
+    ),
     tagsGroup,
     group('dataBackupLegend', h('div', { class: 'actions__row' }, button(t('backupDownload'), backup)), restoreBox),
     listsGroup,
@@ -945,6 +973,7 @@ export async function startApp(root: HTMLElement): Promise<void> {
     renderLists();
     renderTags();
     renderDataLists();
+    renderMarkSwitches();
     const hasData = data.records.size > 0;
     clearGroup.hidden = !hasData;
     body.replaceChildren(...(hasData ? [toolbar, resultsHead, listScroll, exportBar] : [empty]));
@@ -962,6 +991,7 @@ export async function startApp(root: HTMLElement): Promise<void> {
     renderLists(); // rebuilds the list chips before a preset is loaded into the form
     renderTags();
     renderDataLists();
+    renderMarkSwitches();
     // Reload the form when the active preset changed or its stored filter changed (restore).
     const id = data.settings.activePreset;
     if (id !== prev.activePreset || filterKey(prev, id) !== filterKey(data.settings, id)) loadPreset(id);

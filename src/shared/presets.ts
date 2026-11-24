@@ -18,8 +18,21 @@ export const MAX_PRESET_NAME = 40;
 const PRESET_ID_RE = /^[a-z0-9-]{1,40}$/;
 
 export function defaultSettings(): Settings {
-  return { autoCapture: false, panelCollapsed: false, filterPresets: [], activePreset: DEFAULT_PRESET_ID };
+  return {
+    autoCapture: false,
+    panelCollapsed: false,
+    filterPresets: [],
+    activePreset: DEFAULT_PRESET_ID,
+    pageMarks: true,
+    dimRejected: true,
+  };
 }
+
+/** The page-mark switches with their defaults; settings stored by 0.1 have neither key (SPEC 4.7, Ф32). */
+export const pageMarkSettings = (s: Partial<Settings>): { pageMarks: boolean; dimRejected: boolean } => ({
+  pageMarks: s.pageMarks ?? true,
+  dimRejected: s.dimRejected ?? true,
+});
 
 export const isBuiltinPreset = (id: string): boolean => BUILTIN_PRESETS.some((p) => p.id === id);
 
@@ -120,13 +133,18 @@ const hasExactKeys = (o: Record<string, unknown>, keys: readonly string[]): bool
   return own.length === keys.length && keys.every((k) => Object.hasOwn(o, k));
 };
 
+const SETTINGS_KEYS = ['autoCapture', 'panelCollapsed', 'filterPresets', 'activePreset'];
+/** Added in 0.2 (SPEC 4.7): optional, so settings and backups written by 0.1 stay valid. */
+const OPTIONAL_SETTINGS_KEYS = ['pageMarks', 'dimRejected'] as const;
+
 /** Path of the first invalid part of stored settings, or null. Built-in names are checked by the UI. */
 export function settingsError(v: unknown): string | null {
-  if (!isPlainObject(v) || !hasExactKeys(v, ['autoCapture', 'panelCollapsed', 'filterPresets', 'activePreset'])) {
-    return 'settings';
-  }
+  if (!isPlainObject(v)) return 'settings';
+  const present = OPTIONAL_SETTINGS_KEYS.filter((k) => Object.hasOwn(v, k));
+  if (!hasExactKeys(v, [...SETTINGS_KEYS, ...present])) return 'settings';
   if (typeof v.autoCapture !== 'boolean') return 'settings.autoCapture';
   if (typeof v.panelCollapsed !== 'boolean') return 'settings.panelCollapsed';
+  for (const k of present) if (typeof v[k] !== 'boolean') return `settings.${k}`;
   const presets = v.filterPresets;
   if (!Array.isArray(presets) || presets.length > MAX_PRESETS) return 'settings.filterPresets';
   const ids = new Set<string>();

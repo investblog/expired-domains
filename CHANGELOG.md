@@ -7,6 +7,7 @@ All notable changes to Expired Domains are documented here.
 ### Added
 
 - **Live start steps** — while the list is empty, the side panel follows the active tab: open ExpiredDomains.net and sign in → open a domain list (a button opens Deleted .com) → save the page, with a "Save this page" button and the auto-capture switch right in the side panel. A site tab opened before installation gets a hint to reload it. No new permissions
+- **Marks in the site's table** — after each domain on an ExpiredDomains.net list: its status in your collection (saved, shortlisted, rejected, bought; a dot for tags or a note) and "new" for domains that were not in the collection when the page was opened. Click the mark to shortlist or reject the domain or clear its status; a domain not yet saved is saved alone first. Shortlisted rows get a green bar, rejected rows are dimmed (never hidden). Both switches — "Marks in the table" and "Dim rejected" — are in the on-page panel and in the side panel's data drawer, on by default. Marks update when the collection changes, without timers or requests
 
 ## [0.1.1] - 2026-11-21
 

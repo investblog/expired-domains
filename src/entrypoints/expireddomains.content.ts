@@ -1,10 +1,23 @@
+import { createMarks } from '@/content/marks';
 import { mountPanel, type PanelHandle } from '@/content/panel';
 import { t } from '@/shared/i18n';
 import { type Request, sendRequest } from '@/shared/messages';
-import { defaultSettings } from '@/shared/presets';
+import { domainRows, parseListing } from '@/shared/parse';
+import { defaultSettings, pageMarkSettings } from '@/shared/presets';
+import { recordKey } from '@/shared/records';
 import { pageSource } from '@/shared/source';
 import { isTabRequest, type PageState, TAB_READY, type TabSaveResult } from '@/shared/tab-messages';
-import type { Settings } from '@/shared/types';
+import type { DomainRecord, Meta, Settings } from '@/shared/types';
+
+/** The stored records among `got`, by domain; a domain without a record is not in the collection. */
+function recordsByDomain(got: Record<string, unknown>, domains: string[]): Map<string, DomainRecord> {
+  const out = new Map<string, DomainRecord>();
+  for (const d of domains) {
+    const r = got[recordKey(d)];
+    if (r && typeof r === 'object') out.set(d, r as DomainRecord);
+  }
+  return out;
+}
 
 export default defineContentScript({
   matches: ['*://expireddomains.net/*', '*://*.expireddomains.net/*'],
@@ -47,10 +60,21 @@ export default defineContentScript({
     const send = <R extends Request>(msg: R) => sendRequest((m: R) => browser.runtime.sendMessage(m), msg);
 
     // Reading is allowed outside background; only background writes (Ф9).
+    // Settings and this page's records are read in one call, before the panel mounts: the
+    // auto-capture it starts must not hide which domains were new when the page opened (Ф31).
+    const readRecords = async (domains: string[]) => {
+      const got = await browser.storage.local.get(domains.map(recordKey));
+      return recordsByDomain(got, domains);
+    };
     let settings: Settings = defaultSettings();
+    let records = new Map<string, DomainRecord>();
+    const initial = parseListing(document);
+    const ready = initial.diagnostics.code === 'ok';
+    const pageDomains = domainRows(document).map((r) => r.domain);
     try {
-      const got = await browser.storage.local.get('settings');
+      const got = await browser.storage.local.get(['settings', ...(ready ? pageDomains.map(recordKey) : [])]);
       if (got.settings) settings = got.settings as Settings;
+      records = recordsByDomain(got, pageDomains);
     } catch {
       // keep defaults; saving still goes through the background
     }
@@ -66,10 +90,37 @@ export default defineContentScript({
       setSettings: (partial) => send({ type: 'eds:setSettings', settings: partial }),
       contextInvalidated,
     });
-    // Auto-capture may be switched in the side panel too; keep this page's checkbox in step.
+    const panel = handle;
+
+    // SPEC 4.7: marks in the table, only on a table the parser accepts (Ф28).
+    const marks =
+      panel && ready
+        ? createMarks(
+            {
+              doc: document,
+              t,
+              read: readRecords,
+              saveRow: (domain) => panel.saveRow(domain),
+              setStatus: async (domain, status) =>
+                (await send({ type: 'eds:update', domains: [domain], patch: { status } })).ok,
+              failed: () => panel.failed(),
+            },
+            { records, switches: pageMarkSettings(settings) },
+          )
+        : null;
+
+    // Settings may be switched in the side panel too; keep this page in step. Every finished
+    // mutation writes a new `meta` without `pending` (Ф11): then the marks re-read (Ф32).
     browser.storage.onChanged.addListener((changes, area) => {
+      if (area !== 'local' || !panel) return;
       const next = changes.settings?.newValue as Settings | undefined;
-      if (area === 'local' && next && handle) handle.setAutoCapture(next.autoCapture);
+      if (next) {
+        panel.setAutoCapture(next.autoCapture);
+        panel.setMarkSwitches(pageMarkSettings(next));
+        marks?.configure(pageMarkSettings(next));
+      }
+      const meta = changes.meta?.newValue as Meta | undefined;
+      if (marks && meta && meta.pending !== true) void marks.refresh();
     });
     announce();
   },
