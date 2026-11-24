@@ -4,7 +4,8 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createStore, type StorageArea } from '@/background/store';
-import { createMarks, MARK_ATTR, MARKS_STYLE_ID, type MarkSwitches, ROW_ATTR } from '@/content/marks';
+import { CHUNK, createMarks, MARK_ATTR, MARKS_STYLE_ID, type MarkSwitches, ROW_ATTR } from '@/content/marks';
+import { MARK_CSS, pageCss } from '@/content/marks-css';
 import { mountPanel } from '@/content/panel';
 import { makeBackup, parseBackup } from '@/shared/backup';
 import { domainRows, parseListing } from '@/shared/parse';
@@ -281,6 +282,44 @@ describe('page marks: badges, rows and "new" (Ф28, Ф29, Ф31)', () => {
     await s.marks.refresh();
     expect(first()).toBeGreaterThan(0);
     expect(second()).toBe(0);
+  });
+
+  it('a long page is written CHUNK rows per frame; a newer pass replaces a running one (Ф33)', async () => {
+    // A document with a window (requestAnimationFrame): p1's rows repeated to 100.
+    const doc = document;
+    doc.documentElement.innerHTML = load('deleted-com-p1').documentElement.innerHTML;
+    const rows = domainRows(doc).map((r) => r.tr);
+    for (let i = 0; i < 3; i++) rows.at(-1)?.after(...rows.map((tr) => tr.cloneNode(true)));
+    expect(domainRows(doc).length).toBe(100);
+    const frames = async (n: number) => {
+      for (let i = 0; i < n; i++) await new Promise((r) => requestAnimationFrame(r));
+    };
+    const s = await setup(doc, { stored: { [domainRows(doc)[0].domain]: { status: 'rejected' } } });
+    const badges = () => doc.querySelectorAll(`[${MARK_ATTR}]`).length;
+    // setup awaited no frame since createMarks: only the first chunk is drawn.
+    expect(badges()).toBe(CHUNK);
+    await frames(1);
+    expect(badges()).toBe(2 * CHUNK);
+    await frames(100 / CHUNK);
+    expect(badges()).toBe(100);
+    expect(doc.querySelectorAll(`tr[${ROW_ATTR}="rejected"]`).length).toBe(4);
+    // Off, on, off again before a frame: the passes in between stop, nothing is left behind.
+    s.marks.configure({ pageMarks: false, dimRejected: false });
+    s.marks.configure({ pageMarks: true, dimRejected: true });
+    s.marks.configure({ pageMarks: false, dimRejected: false });
+    await frames(100 / CHUNK);
+    expect(doc.querySelectorAll(`[${MARK_ATTR}], [${ROW_ATTR}]`).length).toBe(0);
+    expect(doc.getElementById(MARKS_STYLE_ID)).toBeNull();
+    // refresh() resolves when the whole page is drawn.
+    s.marks.configure({ pageMarks: true, dimRejected: true });
+    await s.marks.refresh();
+    expect(badges()).toBe(100);
+  });
+
+  it('in the table only light colours; the menu follows the system theme (Ф33)', () => {
+    expect(MARK_CSS.match(/prefers-color-scheme/g)).toHaveLength(1);
+    expect(MARK_CSS).toMatch(/prefers-color-scheme: dark\)\s*\{\s*\.menu \{/);
+    expect(pageCss({ pageMarks: true, dimRejected: true })).not.toContain('prefers-color-scheme');
   });
 
   it('overlapping refreshes are coalesced into one more read, not one per change', async () => {

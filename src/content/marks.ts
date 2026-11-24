@@ -66,6 +66,9 @@ const STATUS_LABEL: Record<Status, string> = {
   bought: 'statusBought',
 };
 const MENU_ID = 'menu';
+/** Rows written per animation frame (Ф33). Chromium 154, 200 rows, longest frame: all at once
+ * 18–36 ms, 40 per frame 12–30, 20 per frame 12–18, 10 per frame 6–12 (the idle floor). */
+export const CHUNK = 10;
 
 interface Badge {
   host: HTMLElement;
@@ -277,23 +280,41 @@ export function createMarks(
     open = null;
   }
 
-  /** One pass over the rows: write only what differs from what is drawn. */
-  function apply() {
-    const rows = domainRows(doc);
-    if (switches.pageMarks) for (const row of rows) placeBadge(row, records.get(row.domain));
-    else removeBadges();
-    for (const row of rows) {
-      const status = records.get(row.domain)?.status;
-      const want =
-        (status === 'shortlist' && switches.pageMarks) || (status === 'rejected' && switches.dimRejected)
-          ? status
-          : null;
-      if (want === null) {
-        if (row.tr.hasAttribute(ROW_ATTR)) row.tr.removeAttribute(ROW_ATTR);
-      } else if (row.tr.getAttribute(ROW_ATTR) !== want) {
-        row.tr.setAttribute(ROW_ATTR, want);
-      }
+  function writeRow(row: DomainRow) {
+    const r = records.get(row.domain);
+    if (switches.pageMarks) placeBadge(row, r);
+    const status = r?.status;
+    const want =
+      (status === 'shortlist' && switches.pageMarks) || (status === 'rejected' && switches.dimRejected) ? status : null;
+    if (want === null) {
+      if (row.tr.hasAttribute(ROW_ATTR)) row.tr.removeAttribute(ROW_ATTR);
+    } else if (row.tr.getAttribute(ROW_ATTR) !== want) {
+      row.tr.setAttribute(ROW_ATTR, want);
     }
+  }
+
+  /**
+   * One pass over the rows: write only what differs from what is drawn. Ф33: CHUNK rows per
+   * animation frame, the first chunk at once. A later pass (new records or switches) supersedes
+   * a running one, which stops at its next frame. A document without a window (DOMParser, tests)
+   * is written in one go.
+   */
+  let pass = 0;
+  async function apply(): Promise<void> {
+    const id = ++pass;
+    const rows = domainRows(doc);
+    if (!switches.pageMarks) removeBadges();
+    writeStyle();
+    for (let i = 0; i < rows.length; i += CHUNK) {
+      if (i > 0 && view) {
+        await new Promise((done) => view.requestAnimationFrame(done));
+        if (id !== pass) return;
+      }
+      for (const row of rows.slice(i, i + CHUNK)) writeRow(row);
+    }
+  }
+
+  function writeStyle() {
     const css = pageCss(switches);
     if (!css) {
       style?.remove();
@@ -326,7 +347,7 @@ export function createMarks(
         } catch {
           return; // extension reloaded under this page (Е3): keep what is drawn
         }
-        apply();
+        await apply();
       } while (again);
     })().finally(() => {
       running = null;
@@ -334,11 +355,11 @@ export function createMarks(
     return running;
   }
 
-  apply();
+  void apply();
   return {
     configure(next) {
       switches = { ...next };
-      apply();
+      void apply();
     },
     refresh,
   };

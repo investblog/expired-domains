@@ -1,7 +1,9 @@
 // Page-mark styles (SPEC 4.7). MARK_CSS goes inside every badge's closed shadow root (badge and
 // its popover menu); pageCss() is the one <style> we add to the site's document: rules only for
 // our own attributes (`data-eds` on rows, `data-eds-mark` on our badge hosts), no site class is
-// restyled (Ф29). Colours follow the side panel's status badges (Ф13) and prefers-color-scheme
+// restyled (Ф29). Colours follow the side panel's status badges (Ф13). What sits in the table (badge,
+// "new", the row bar) is always light: the site is light, and the dark tokens on its white rows give
+// 2.3–3.2:1. Only the menu, on its own background in the top layer, follows prefers-color-scheme
 // (Ф33). The host's inline `all: initial !important` beats :host declarations except custom
 // properties, so font and colour are set on our own elements, tokens on :host.
 
@@ -20,7 +22,7 @@ export const MARK_CSS = `
   --shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
 }
 @media (prefers-color-scheme: dark) {
-  :host {
+  .menu {
     --bg: #181a1f;
     --text: #e7e9ee;
     --muted: #a0a4af;
@@ -90,7 +92,6 @@ export function pageCss(opts: { pageMarks: boolean; dimRejected: boolean }): str
     // unreliable across table layouts.
     rules.push(
       'tr[data-eds~="shortlist"] > td:first-child { box-shadow: inset 3px 0 0 #0e8a58 !important; }',
-      '@media (prefers-color-scheme: dark) { tr[data-eds~="shortlist"] > td:first-child { box-shadow: inset 3px 0 0 #18c27a !important; } }',
       'tr:hover [data-eds-mark] { --eds-reveal: 1; }',
     );
   }
