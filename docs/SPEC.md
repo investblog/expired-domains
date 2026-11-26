@@ -34,7 +34,8 @@ project: expired-domains-saver
   [ADR-0002](decisions/ADR-0002-storage-and-permissions.md),
   [ADR-0003](decisions/ADR-0003-wxt-and-301-conventions.md),
   [ADR-0004](decisions/ADR-0004-ahrefs-dr-opt-in.md),
-  [ADR-0005](decisions/ADR-0005-sidepanel-only.md);
+  [ADR-0005](decisions/ADR-0005-sidepanel-only.md),
+  [ADR-0006](decisions/ADR-0006-rdap-check-opt-in.md);
 - образец стека и оформления — `redirect-inspector` и `agent-readiness` (раздел 8.2).
 
 Где ТЗ расходится с наброском, прав ТЗ (сводка расхождений — раздел 11).
@@ -63,7 +64,9 @@ project: expired-domains-saver
 - переименование тегов;
 - реакция на обновление таблицы без перезагрузки страницы (см. С2);
 - проверка Ahrefs DR ключом пользователя — **v1.1**, включается по желанию и меняет
-  I1/I4/I5 ([ADR-0004](decisions/ADR-0004-ahrefs-dr-opt-in.md)).
+  I1/I4/I5 ([ADR-0004](decisions/ADR-0004-ahrefs-dr-opt-in.md));
+- проверка доменов в реестре (RDAP) по кнопке — **v1.1**, вместе с DR, тоже по желанию
+  ([ADR-0006](decisions/ADR-0006-rdap-check-opt-in.md)).
 
 Целевой объём: **до 10 000 доменов** в одном накоплении (решение пользователя, 2026-11-19).
 Распространение: Chrome Web Store, Edge Add-ons, AMO (решение пользователя, 2026-11-19).
