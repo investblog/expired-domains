@@ -119,8 +119,8 @@ export function mountPanel(deps: PanelDeps): PanelHandle | null {
   collapsedBtn.append(inlineIcon(doc, 'list'));
   // Ф3а: while auto-capture is on the launcher is filled and says so, so a collapsed panel does
   // not hide the mode. Both labels are read now, while the extension context is alive.
-  const LAUNCHER_LABEL = `${t('extName')} — ${t('panelExpand')}`;
-  const LAUNCHER_AUTO_LABEL = `${t('extName')} — ${t('panelAutoOn')} — ${t('panelExpand')}`;
+  const LAUNCHER_LABEL = `${t('appName')} — ${t('panelExpand')}`;
+  const LAUNCHER_AUTO_LABEL = `${t('appName')} — ${t('panelAutoOn')} — ${t('panelExpand')}`;
   let autoOn = deps.settings.autoCapture;
   const showAutoMode = (on: boolean) => {
     autoOn = on;
@@ -133,9 +133,9 @@ export function mountPanel(deps: PanelDeps): PanelHandle | null {
   // Expanded panel.
   const panel = el('div', 'panel');
   panel.setAttribute('role', 'region');
-  panel.setAttribute('aria-label', t('extName'));
+  panel.setAttribute('aria-label', t('appName'));
   const head = el('div', 'head');
-  const title = el('div', 'title', t('extName'));
+  const title = el('div', 'title', t('appName'));
   const collapseBtn = el('button', 'icon-btn');
   collapseBtn.type = 'button';
   collapseBtn.append(inlineIcon(doc, 'minus'));

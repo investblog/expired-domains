@@ -123,7 +123,7 @@ const statusSelect = (value: Status = 'new') => {
 
 export async function startApp(root: HTMLElement): Promise<void> {
   document.documentElement.lang = browser.i18n.getUILanguage().startsWith('ru') ? 'ru' : 'en';
-  document.title = t('extName');
+  document.title = t('appName');
   const theme = initTheme();
 
   let data: Data = readData({});
@@ -166,7 +166,7 @@ export async function startApp(root: HTMLElement): Promise<void> {
       },
       icon('brand-301', 'logo'),
     ),
-    h('h1', { class: 'title', text: t('extName') }),
+    h('h1', { class: 'title', text: t('appName') }),
     h(
       'div',
       { class: 'header__actions' },

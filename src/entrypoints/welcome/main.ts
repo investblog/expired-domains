@@ -65,7 +65,7 @@ function render(app: HTMLElement): void {
   appIcon.src = '/icons/48.png';
   appIcon.alt = '';
   const head = el('div', '');
-  head.append(el('h1', 'welcome__title', t('extName')), el('p', 'welcome__tagline', t('welTagline')));
+  head.append(el('h1', 'welcome__title', t('appName')), el('p', 'welcome__tagline', t('welTagline')));
   header.append(appIcon, head);
 
   const what = el('section', 'welcome-card');
@@ -143,7 +143,7 @@ function render(app: HTMLElement): void {
 }
 
 document.documentElement.lang = browser.i18n.getUILanguage().startsWith('ru') ? 'ru' : 'en';
-document.title = t('extName');
+document.title = t('appName');
 initTheme();
 const root = document.getElementById('app');
 if (root) render(root);

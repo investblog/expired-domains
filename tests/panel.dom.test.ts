@@ -215,10 +215,10 @@ describe('auto-capture, collapse, errors (С2, Ф3, Е3)', () => {
   it('the collapsed launcher shows the auto-capture mode and follows the stored switch (Ф3а)', async () => {
     const on = setup(load('deleted-com-p1'), { settings: { autoCapture: true, panelCollapsed: true } });
     expect(on.q('.collapsed').classList.contains('collapsed--auto')).toBe(true);
-    expect(on.q('.collapsed').getAttribute('aria-label')).toBe('extName — panelAutoOn — panelExpand');
+    expect(on.q('.collapsed').getAttribute('aria-label')).toBe('appName — panelAutoOn — panelExpand');
     const off = setup(load('deleted-com-p1'), { settings: { autoCapture: false, panelCollapsed: true } });
     expect(off.q('.collapsed').classList.contains('collapsed--auto')).toBe(false);
-    expect(off.q('.collapsed').getAttribute('aria-label')).toBe('extName — panelExpand');
+    expect(off.q('.collapsed').getAttribute('aria-label')).toBe('appName — panelExpand');
     const box = off.q<HTMLInputElement>('input[type="checkbox"]');
     box.checked = true;
     box.dispatchEvent(new Event('change'));

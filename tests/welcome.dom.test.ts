@@ -29,7 +29,7 @@ beforeEach(() => {
 describe('welcome page', () => {
   it('explains the site, then four steps; the first one links to the free sign-up', async () => {
     const app = await load({});
-    expect(app.querySelector('h1')?.textContent).toBe('extName');
+    expect(app.querySelector('h1')?.textContent).toBe('appName');
     const steps = Array.from(app.querySelectorAll('.welcome-step__title')).map((x) => x.textContent);
     expect(steps).toEqual(['welStepAccountTitle', 'welStepListTitle', 'welStepSaveTitle', 'welStepPanelTitle']);
     const register = Array.from(app.querySelectorAll('a')).find((a) => a.textContent === 'linkRegister');

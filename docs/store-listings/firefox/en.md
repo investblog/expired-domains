@@ -2,7 +2,7 @@
 
 Collect domain lists from ExpiredDomains.net while you browse — into one list you can filter, mark and export, without copying page after page by hand.
 
-The extension saves what you already see on screen and sends no requests. It never opens pages for you.
+Unofficial, not affiliated with ExpiredDomains.net. The extension saves what you already see on screen and sends no requests. It never opens pages for you.
 
 ## What it is for
 

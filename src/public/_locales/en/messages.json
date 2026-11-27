@@ -1,9 +1,12 @@
 {
   "extName": {
+    "message": "Expired Domains — Save, Filter & Export"
+  },
+  "appName": {
     "message": "Expired Domains"
   },
   "extDescription": {
-    "message": "Save expireddomains.net lists as you browse, filter and export to CSV/TXT. Unofficial. Not affiliated with ExpiredDomains.net."
+    "message": "Save expired, dropped and deleted domain lists from expireddomains.net as you browse. Filter, shortlist, export to CSV. Unofficial."
   },
   "panelOnPage": {
     "message": "On page: $count$",

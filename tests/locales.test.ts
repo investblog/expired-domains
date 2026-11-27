@@ -59,6 +59,13 @@ describe('locales', () => {
     }
   });
 
+  it('extName (the store title) fits the AMO limit of 50 characters; appName is the short in-app title', () => {
+    for (const lang of ['en', 'ru']) {
+      expect([...load(lang).extName.message].length, lang).toBeLessThanOrEqual(50);
+      expect(load(lang).appName.message, lang).toBe('Expired Domains');
+    }
+  });
+
   it('preset error keys exist for every error code', () => {
     const en = load('en');
     for (const code of ['name', 'name_taken', 'limit', 'not_found', 'builtin', 'filter']) {

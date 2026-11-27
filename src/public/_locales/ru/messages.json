@@ -1,9 +1,12 @@
 {
   "extName": {
+    "message": "Expired Domains — сбор, фильтр и экспорт в CSV"
+  },
+  "appName": {
     "message": "Expired Domains"
   },
   "extDescription": {
-    "message": "Собирает списки expireddomains.net по мере просмотра; выгрузка в CSV/TXT. Неофициальное расширение, не связано с ExpiredDomains.net."
+    "message": "Собирает просроченные и удалённые домены с expireddomains.net по мере просмотра: фильтр, подборка, экспорт в CSV. Неофициальное."
   },
   "panelOnPage": {
     "message": "На странице: $count$",
